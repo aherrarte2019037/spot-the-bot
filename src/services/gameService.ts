@@ -1,15 +1,25 @@
 import { supabase } from '../core/supabase';
+import { gameLogger } from '../utils/logger';
 
 export const gameService = {
   async createGame(): Promise<any> {
-    const { data, error } = await supabase
-      .from('games')
-      .insert({ status: 'waiting' })
-      .select()
-      .single();
-    
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .insert({ status: 'waiting' })
+        .select()
+        .single();
+      
+      if (error) {
+        gameLogger.error('Failed to create game:', error);
+        throw error;
+      }
+      
+      return data;
+    } catch (error) {
+      gameLogger.error('Create game error:', error);
+      throw error;
+    }
   },
 
   async joinGame(gameId: number, userId: number): Promise<any> {
