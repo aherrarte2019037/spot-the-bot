@@ -33,7 +33,7 @@ export const LOG_LEVELS = {
   ERROR: 'error',
 } as const;
 
-export const authLogger = log.extend('AUTH');
-export const gameLogger = log.extend('GAME');
-export const apiLogger = log.extend('API');
-export const commonLogger = log.extend('UI');
+export const authLogger = log.extend('AUTH-SERVICE');
+export const gameLogger = log.extend('GAME-SERVICE');
+export const apiLogger = log.extend('API-SERVICE');
+export const commonLogger = log.extend('LOG');

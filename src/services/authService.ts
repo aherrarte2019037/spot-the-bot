@@ -2,11 +2,12 @@ import { supabase } from '../core/supabase';
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { Platform } from 'react-native';
-import { authLogger } from '../utils/logger';
+import { authLogger, commonLogger } from '../utils/logger';
 import { PlatformType } from '../types';
+import { oauthConfig } from '../core';
 
 GoogleSignin.configure({
-  webClientId: 'your-google-web-client-id',
+  webClientId: oauthConfig.googleWebClientId,
 });
 
 export const authService = {
@@ -20,17 +21,17 @@ export const authService = {
         authLogger.error('Google sign-in failed:', userInfo);
         throw new Error('Google sign-in failed');
       }
-      
+
       const { data, error } = await supabase.auth.signInWithIdToken({
         provider: 'google',
         token: userInfo.data!.idToken!,
       });
-      
+
       if (error) {
         authLogger.error('Supabase Google auth failed:', error);
         throw error;
       }
-      
+
       return data;
     } catch (error) {
       authLogger.error('Google sign-in failed:', error);
@@ -80,12 +81,12 @@ export const authService = {
           data: { username }
         }
       });
-      
+
       if (error) {
         authLogger.error('Email sign-up failed:', error);
         throw error;
       }
-      
+
       return data;
     } catch (error) {
       authLogger.error('Email sign-up error:', error);
@@ -100,12 +101,12 @@ export const authService = {
         email,
         password
       });
-      
+
       if (error) {
         authLogger.error('Email sign-in failed:', error);
         throw error;
       }
-      
+
       return data;
     } catch (error) {
       authLogger.error('Email sign-in error:', error);
@@ -116,7 +117,7 @@ export const authService = {
   async signOut() {
     try {
       await GoogleSignin.signOut();
-      
+
       const { error } = await supabase.auth.signOut();
       if (error) {
         authLogger.error('Supabase sign-out failed:', error);
