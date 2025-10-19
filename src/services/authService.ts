@@ -1,39 +1,138 @@
 import { supabase } from '../core/supabase';
+import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
+import * as AppleAuthentication from 'expo-apple-authentication';
+import { Platform } from 'react-native';
+import { authLogger } from '../utils/logger';
+import { PlatformType } from '../types';
+
+GoogleSignin.configure({
+  webClientId: 'your-google-web-client-id',
+});
 
 export const authService = {
-  async signInAnonymously() {
-    const { data, error } = await supabase.auth.signInAnonymously();
-    if (error) throw error;
-    return data;
-  },
+  // Google Sign-In (Android + iOS)
+  async signInWithGoogle() {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
 
-  async signUp(email: string, password: string, username: string) {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { username }
+      if (!isSuccessResponse(userInfo)) {
+        authLogger.error('Google sign-in failed:', userInfo);
+        throw new Error('Google sign-in failed');
       }
-    });
-    if (error) throw error;
-    return data;
+      
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
+        token: userInfo.data!.idToken!,
+      });
+      
+      if (error) {
+        authLogger.error('Supabase Google auth failed:', error);
+        throw error;
+      }
+      
+      return data;
+    } catch (error) {
+      authLogger.error('Google sign-in failed:', error);
+      throw error;
+    }
   },
 
-  async signIn(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    if (error) throw error;
-    return data;
+  // Apple Sign-In (iOS only)
+  async signInWithApple() {
+    if (Platform.OS !== 'ios') {
+      authLogger.warn('Apple Sign-In attempted on non-iOS platform');
+      throw new Error('Apple Sign-In is only available on iOS');
+    }
+
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'apple',
+        token: credential.identityToken!,
+      });
+
+      if (error) {
+        authLogger.error('Supabase Apple auth failed:', error);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      authLogger.error('Apple sign-in failed:', error);
+      throw error;
+    }
+  },
+
+  // Email/Password Sign Up
+  async signUpWithEmail(email: string, password: string, username: string) {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username }
+        }
+      });
+      
+      if (error) {
+        authLogger.error('Email sign-up failed:', error);
+        throw error;
+      }
+      
+      return data;
+    } catch (error) {
+      authLogger.error('Email sign-up error:', error);
+      throw error;
+    }
+  },
+
+  // Email/Password Sign In
+  async signInWithEmail(email: string, password: string) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (error) {
+        authLogger.error('Email sign-in failed:', error);
+        throw error;
+      }
+      
+      return data;
+    } catch (error) {
+      authLogger.error('Email sign-in error:', error);
+      throw error;
+    }
   },
 
   async signOut() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      await GoogleSignin.signOut();
+      
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        authLogger.error('Supabase sign-out failed:', error);
+        throw error;
+      }
+    } catch (error) {
+      authLogger.error('Sign-out error:', error);
+      throw error;
+    }
   },
 
   getCurrentUser() {
     return supabase.auth.getUser();
+  },
+
+  isAppleSignInAvailable() {
+    return Platform.OS === PlatformType.IOS && AppleAuthentication.isAvailableAsync();
   }
 };

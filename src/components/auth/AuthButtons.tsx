@@ -54,7 +54,7 @@ export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
 
 	return (
 		<View style={styles.container}>
-			<Text style={styles.title}>Welcome to Bot or Not</Text>
+			<Text style={styles.title}>Welcome to Spot the Bot</Text>
 			<Text style={styles.subtitle}>Sign in to start playing</Text>
 
 			<View style={styles.buttonContainer}>

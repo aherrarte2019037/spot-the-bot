@@ -65,7 +65,7 @@ export default function HomeScreen({ navigation }: any) {
         style={styles.gradient}
       >
         <View style={styles.content}>
-          <Text style={styles.title}>Bot or Not</Text>
+          <Text style={styles.title}>Spot the Bot</Text>
           <Text style={styles.subtitle}>Can you spot the AI?</Text>
           
           <View style={styles.userInfo}>

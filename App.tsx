@@ -32,7 +32,7 @@ export default function App() {
             <Stack.Screen 
               name="Home" 
               component={HomeScreen}
-              options={{ title: 'Bot or Not' }}
+              options={{ title: 'Spot the Bot' }}
             />
             <Stack.Screen 
               name="Game" 

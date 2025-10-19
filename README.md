@@ -1,2 +1,2 @@
-# Bot or Not
-Bot or Not Mobile Game
+# Spot the Bot
+Spot the Bot Mobile Game

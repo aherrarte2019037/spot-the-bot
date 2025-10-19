@@ -1,4 +1,4 @@
-Bot or Not - MVP Product Spec
+Spot the Bot - MVP Product Spec
 
 Product Vision
 A 5-minute social deduction game where players chat with a mix of humans and AI bots, then vote on who's fake. The first game that makes Turing Tests fun.

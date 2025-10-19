@@ -3,8 +3,8 @@ import { CustomExpoConfig } from './src/types/config';
 
 export default ({ config }: ConfigContext): CustomExpoConfig => ({
   ...config,
-  name: 'Bot or Not',
-  slug: 'BotOrNot',
+  name: 'Spot the Bot',
+  slug: 'spot-the-bot',
   version: '1.0.0',
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -16,7 +16,9 @@ export default ({ config }: ConfigContext): CustomExpoConfig => ({
     backgroundColor: '#ffffff'
   },
   ios: {
-    supportsTablet: true
+    supportsTablet: true,
+    bundleIdentifier: "com.playspotbot.spotthebot",
+    usesAppleSignIn: true
   },
   android: {
     adaptiveIcon: {
@@ -24,13 +26,14 @@ export default ({ config }: ConfigContext): CustomExpoConfig => ({
       backgroundColor: '#ffffff'
     },
     edgeToEdgeEnabled: true,
-    predictiveBackGestureEnabled: false
+    predictiveBackGestureEnabled: false,
+    package: "com.playspotbot.spotthebot"
   },
   web: {
     favicon: './assets/favicon.png'
   },
   extra: {
-    supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
-    supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY
+    supabaseUrl: 'https://zbpowpvpzsugrdqwurub.supabase.co',
+    supabaseAnonKey: 'sb_publishable_3n1MmTMPEGsOFET0S5tbsQ_x4ZIqwPz'
   }
 });

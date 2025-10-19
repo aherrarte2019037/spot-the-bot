@@ -1,4 +1,4 @@
-# Bot or Not - Tech Stack Vision
+# Spot the Bot - Tech Stack Vision
 
 ## **The Big Picture**
 
