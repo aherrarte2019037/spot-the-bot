@@ -33,7 +33,11 @@ export default ({ config }: ConfigContext): CustomExpoConfig => ({
     favicon: './assets/favicon.png'
   },
   extra: {
+    eas: {
+      projectId: 'dc73814d-67a9-4f6b-8a2e-713eaf9a230c'
+    },
     supabaseUrl: 'https://zbpowpvpzsugrdqwurub.supabase.co',
-    supabaseAnonKey: 'sb_publishable_3n1MmTMPEGsOFET0S5tbsQ_x4ZIqwPz'
+    supabaseAnonKey: 'sb_publishable_3n1MmTMPEGsOFET0S5tbsQ_x4ZIqwPz',
+    googleWebClientId: '914625079481-pdashsqk84b0jsmslq3gbc5gna8g34jj.apps.googleusercontent.com'
   }
 });
