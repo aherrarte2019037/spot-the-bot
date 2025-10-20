@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, Alert } from "react-native";
 import { authService } from "../../services";
-import {
-	GoogleSignInButton,
-	AppleSignInButton,
-	EmailSignInButton,
-} from ".";
+import GoogleSignInButton from "./GoogleSignInButton";
+import AppleSignInButton from "./AppleSignInButton";
+import EmailSignInButton from "./EmailSignInButton";
 
 interface AuthButtonsProps {
 	onAuthSuccess: (user: any) => void;

@@ -8,6 +8,7 @@ import { oauthConfig } from '../core';
 
 GoogleSignin.configure({
   webClientId: oauthConfig.googleWebClientId,
+  iosClientId: oauthConfig.googleIOSClientId,
 });
 
 export const authService = {

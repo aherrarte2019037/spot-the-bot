@@ -4,6 +4,7 @@ export interface ExtraConfig {
   supabaseUrl: string;
   supabaseAnonKey: string;
   googleWebClientId: string;
+  googleIOSClientId: string;
   eas: {
     projectId: string;
   }
@@ -20,4 +21,5 @@ export interface SupabaseConfig {
 
 export interface OAuthConfig {
   googleWebClientId: string;
+  googleIOSClientId: string;
 }
