@@ -5,6 +5,7 @@ import {
 	TextInput,
 	StyleSheet,
 	TextInputProps,
+  TouchableOpacity,
 } from "react-native";
 import { Control, Controller, FieldError } from "react-hook-form";
 
@@ -14,6 +15,7 @@ interface FormInputProps extends Omit<TextInputProps, "onChangeText" | "onBlur" 
 	prefix?: React.ReactNode;
 	suffix?: React.ReactNode;
 	error?: FieldError;
+  onPressSuffix?: VoidFunction;
 }
 
 export default function FormInput({
@@ -22,6 +24,7 @@ export default function FormInput({
 	prefix,
 	suffix,
 	error,
+	onPressSuffix,
 	...textInputProps
 }: FormInputProps) {
 	return (
@@ -40,7 +43,14 @@ export default function FormInput({
 							onBlur={onBlur}
 							{...textInputProps}
 						/>
-						{suffix && <View style={styles.suffixContainer}>{suffix}</View>}
+						{suffix && (
+							<TouchableOpacity
+								onPress={onPressSuffix}
+								style={styles.suffixContainer}
+							>
+								{suffix}
+							</TouchableOpacity>
+						)}
 					</View>
 				)}
 			/>
@@ -52,21 +62,27 @@ export default function FormInput({
 const styles = StyleSheet.create({
 	inputContainer: {
 		flexDirection: "row",
-		alignItems: "center",
+		alignItems: "stretch",
 		backgroundColor: "#0f172a",
 		borderRadius: 12,
 		borderWidth: 1,
 		borderColor: "#334155",
-		paddingHorizontal: 16,
+		minHeight: 56,
 	},
 	inputError: {
 		borderColor: "#ef4444",
 	},
 	prefixContainer: {
-		marginRight: 12,
+		justifyContent: "center",
+		alignItems: "stretch",
+		paddingLeft: 16,
+		paddingRight: 16,
 	},
 	suffixContainer: {
-		marginLeft: 12,
+		justifyContent: "center",
+		alignItems: "stretch",
+		paddingRight: 16,
+		paddingLeft: 16,
 	},
 	input: {
 		flex: 1,

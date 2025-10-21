@@ -141,7 +141,6 @@ export default function SignUpModal({
 									}
 									placeholder="Username"
 									error={errors.username}
-									autoCapitalize="none"
 									editable={!loading}
 								/>
 
@@ -154,7 +153,6 @@ export default function SignUpModal({
 									placeholder="Email"
 									error={errors.email}
 									keyboardType="email-address"
-									autoCapitalize="none"
 									autoComplete="email"
 									editable={!loading}
 								/>
@@ -172,19 +170,15 @@ export default function SignUpModal({
 									placeholder="Password"
 									error={errors.password}
 									secureTextEntry={!showPassword}
-									autoCapitalize="none"
 									autoComplete="password"
 									editable={!loading}
+									onPressSuffix={() => setShowPassword(!showPassword)}
 									suffix={
-										<TouchableOpacity
-											onPress={() => setShowPassword(!showPassword)}
-										>
-											<Ionicons
-												name={showPassword ? "eye-outline" : "eye-off-outline"}
-												size={20}
-												color="#64748b"
-											/>
-										</TouchableOpacity>
+										<Ionicons
+											name={showPassword ? "eye-outline" : "eye-off-outline"}
+											size={20}
+											color="#64748b"
+										/>
 									}
 								/>
 
@@ -201,7 +195,6 @@ export default function SignUpModal({
 									placeholder="Confirm Password"
 									error={errors.confirmPassword}
 									secureTextEntry={!showPassword}
-									autoCapitalize="none"
 									editable={!loading}
 								/>
 

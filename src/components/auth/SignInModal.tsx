@@ -128,7 +128,6 @@ export default function SignInModal({
 									placeholder="Email"
 									error={errors.email}
 									keyboardType="email-address"
-									autoCapitalize="none"
 									autoComplete="email"
 									editable={!loading}
 								/>
@@ -146,20 +145,16 @@ export default function SignInModal({
 									placeholder="Password"
 									error={errors.password}
 									secureTextEntry={!showPassword}
-									autoCapitalize="none"
 									autoComplete="password"
 									editable={!loading}
 									suffix={
-										<TouchableOpacity
-											onPress={() => setShowPassword(!showPassword)}
-										>
-											<Ionicons
-												name={showPassword ? "eye-outline" : "eye-off-outline"}
-												size={20}
-												color="#64748b"
-											/>
-										</TouchableOpacity>
+										<Ionicons
+											name={showPassword ? "eye-outline" : "eye-off-outline"}
+											size={20}
+											color="#64748b"
+										/>
 									}
+                  onPressSuffix={() => setShowPassword(!showPassword)}
 								/>
 
 								<TouchableOpacity
@@ -178,9 +173,7 @@ export default function SignInModal({
 								</TouchableOpacity>
 
 								<View style={styles.toggleContainer}>
-									<Text style={styles.toggleText}>
-										Don't have an account?
-									</Text>
+									<Text style={styles.toggleText}>Don't have an account?</Text>
 									<TouchableOpacity
 										onPress={handleSwitchToSignUp}
 										disabled={loading}
