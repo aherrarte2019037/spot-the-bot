@@ -4,6 +4,8 @@ import { authService } from "../../services";
 import GoogleSignInButton from "./GoogleSignInButton";
 import AppleSignInButton from "./AppleSignInButton";
 import EmailSignInButton from "./EmailSignInButton";
+import SignInModal from "./SignInModal";
+import SignUpModal from "./SignUpModal";
 
 interface AuthButtonsProps {
 	onAuthSuccess: (user: any) => void;
@@ -12,6 +14,8 @@ interface AuthButtonsProps {
 export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
 	const [isAppleAvailable, setIsAppleAvailable] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [showSignInModal, setShowSignInModal] = useState(false);
+	const [showSignUpModal, setShowSignUpModal] = useState(false);
 
 	useEffect(() => {
 		checkAppleAvailability();
@@ -47,7 +51,7 @@ export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
 	};
 
 	const handleEmailSignIn = () => {
-		Alert.alert("Coming Soon", "Email sign-in will be available soon!");
+		setShowSignInModal(true);
 	};
 
 	return (
@@ -66,6 +70,26 @@ export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
 			</View>
 
 			{loading && <Text style={styles.loadingText}>Signing in...</Text>}
+
+			<SignInModal
+				visible={showSignInModal}
+				onClose={() => setShowSignInModal(false)}
+				onAuthSuccess={onAuthSuccess}
+				onSwitchToSignUp={() => {
+					setShowSignInModal(false);
+					setShowSignUpModal(true);
+				}}
+			/>
+
+			<SignUpModal
+				visible={showSignUpModal}
+				onClose={() => setShowSignUpModal(false)}
+				onAuthSuccess={onAuthSuccess}
+				onSwitchToSignIn={() => {
+					setShowSignUpModal(false);
+					setShowSignInModal(true);
+				}}
+			/>
 		</View>
 	);
 }

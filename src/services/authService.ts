@@ -42,7 +42,7 @@ export const authService = {
 
   // Apple Sign-In (iOS only)
   async signInWithApple() {
-    if (Platform.OS !== 'ios') {
+    if (Platform.OS !== PlatformType.IOS) {
       authLogger.warn('Apple Sign-In attempted on non-iOS platform');
       throw new Error('Apple Sign-In is only available on iOS');
     }
