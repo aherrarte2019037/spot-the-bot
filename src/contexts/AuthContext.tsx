@@ -7,6 +7,7 @@ export type AuthData = {
   user: User;
   isLoading: boolean;
   isLoggedIn: boolean;
+  refreshUser: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthData>({
@@ -14,6 +15,7 @@ export const AuthContext = createContext<AuthData>({
   user: EmptyUser,
   isLoading: true,
   isLoggedIn: false,
+  refreshUser: async () => {},
 });
 
 export const useAuthContext = () => {

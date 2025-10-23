@@ -3,7 +3,7 @@ import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/goo
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { Platform } from 'react-native';
 import { authLogger } from '../utils/logger';
-import { PlatformType } from '../types';
+import { SocialAuthProvider, PlatformType } from '../types';
 import { oauthConfig } from '../core';
 
 GoogleSignin.configure({
@@ -24,7 +24,7 @@ export const authService = {
       }
 
       const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: 'google',
+        provider: SocialAuthProvider.GOOGLE,
         token: userInfo.data!.idToken!,
       });
 
@@ -56,7 +56,7 @@ export const authService = {
       });
 
       const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: 'apple',
+        provider: SocialAuthProvider.APPLE,
         token: credential.identityToken!,
       });
 

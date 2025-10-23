@@ -3,7 +3,7 @@ import { User } from '../types';
 import { authLogger } from '../utils/logger';
 
 export const profileService = {
-  async getProfile(userId: string): Promise<User | null> {
+  async get(userId: string): Promise<User | null> {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -28,7 +28,7 @@ export const profileService = {
     }
   },
 
-  async updateProfile(userId: string, updates: Partial<Omit<User, 'id'>>): Promise<boolean> {
+  async update(userId: string, updates: Partial<Omit<User, 'id'>>): Promise<boolean> {
     try {
       const { error } = await supabase
         .from('profiles')
@@ -52,7 +52,7 @@ export const profileService = {
     }
   },
 
-  async createProfile(userId: string, userData: Omit<User, 'id'>): Promise<boolean> {
+  async create(userId: string, userData: Omit<User, 'id'>): Promise<boolean> {
     try {
       const { error } = await supabase
         .from('profiles')
@@ -75,7 +75,7 @@ export const profileService = {
     }
   },
 
-  async deleteProfile(userId: string): Promise<boolean> {
+  async delete(userId: string): Promise<boolean> {
     try {
       const { error } = await supabase
         .from('profiles')
