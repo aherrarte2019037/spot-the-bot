@@ -5,7 +5,6 @@ import { supabase } from '../core/supabase';
 import { AuthContext, AuthData } from '../contexts/AuthContext';
 import { User, EmptyUser } from '../types';
 import { authLogger } from '../utils/logger';
-import { mapSupabaseUserToUser } from '../utils/userMapper';
 import { profileService } from '../services/profileService';
 
 SplashScreen.preventAutoHideAsync();
@@ -15,10 +14,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [user, setUser] = useState<User>(EmptyUser);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load user profile from database
   const loadUserProfile = async (userId: string): Promise<User> => {
     try {
-      // First try to get from profiles table
       const profileUser = await profileService.getProfile(userId);
       if (profileUser) {
         return profileUser;

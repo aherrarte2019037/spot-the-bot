@@ -3,7 +3,6 @@ import { User } from '../types';
 import { authLogger } from '../utils/logger';
 
 export const profileService = {
-  // Get user profile from public.profiles table
   async getProfile(userId: string): Promise<User | null> {
     try {
       const { data, error } = await supabase
@@ -29,7 +28,6 @@ export const profileService = {
     }
   },
 
-  // Update user profile
   async updateProfile(userId: string, updates: Partial<Omit<User, 'id'>>): Promise<boolean> {
     try {
       const { error } = await supabase
@@ -54,7 +52,6 @@ export const profileService = {
     }
   },
 
-  // Create profile (usually called by trigger, but can be used manually)
   async createProfile(userId: string, userData: Omit<User, 'id'>): Promise<boolean> {
     try {
       const { error } = await supabase
@@ -78,7 +75,6 @@ export const profileService = {
     }
   },
 
-  // Delete profile (usually handled by cascade delete from auth.users)
   async deleteProfile(userId: string): Promise<boolean> {
     try {
       const { error } = await supabase
