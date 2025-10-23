@@ -24,14 +24,12 @@ import { PlatformType } from "../../types";
 interface SignUpModalProps {
 	visible: boolean;
 	onClose: () => void;
-	onAuthSuccess: (user: any) => void;
 	onSwitchToSignIn: () => void;
 }
 
 export default function SignUpModal({
 	visible,
 	onClose,
-	onAuthSuccess,
 	onSwitchToSignIn,
 }: SignUpModalProps) {
 	const [loading, setLoading] = useState(false);
@@ -76,9 +74,6 @@ export default function SignUpModal({
 						text: "OK",
 						onPress: () => {
 							handleClose();
-							if (user) {
-								onAuthSuccess(user);
-							}
 						},
 					},
 				]

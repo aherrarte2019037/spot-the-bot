@@ -1,46 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { authService } from '../services';
 import AuthButtons from '../components/auth/AuthButtons';
-import { commonLogger } from '../utils/logger';
+import { useAuthContext } from '../contexts/AuthContext';
+import { authLogger } from '../utils/logger';
 
 export default function HomeScreen({ navigation }: any) {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const { data } = await authService.getCurrentUser();
-      if (data.user) {
-        setUser(data.user);
-      }
-    } catch (error) {
-      commonLogger.error('Error checking auth status:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAuthSuccess = (user: any) => {
-    setUser(user);
-  };
+  const { user, isLoading, isLoggedIn } = useAuthContext();
 
   const handleSignOut = async () => {
     try {
       await authService.signOut();
-      setUser(null);
     } catch (error) {
-      commonLogger.error('Sign out error:', error);
+      authLogger.error('Sign out error:', error);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -50,10 +28,10 @@ export default function HomeScreen({ navigation }: any) {
     );
   }
 
-  if (!user) {
+  if (!isLoggedIn) {
     return (
       <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.container}>
-        <AuthButtons onAuthSuccess={handleAuthSuccess} />
+        <AuthButtons />
       </LinearGradient>
     );
   }
@@ -69,7 +47,7 @@ export default function HomeScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Can you spot the AI?</Text>
           
           <View style={styles.userInfo}>
-            <Text style={styles.welcomeText}>Welcome, {user.email || 'Player'}!</Text>
+            <Text style={styles.welcomeText}>Welcome, {user.username}!</Text>
             <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
               <Text style={styles.signOutText}>Sign Out</Text>
             </TouchableOpacity>

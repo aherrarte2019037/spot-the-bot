@@ -7,11 +7,7 @@ import EmailSignInButton from "./EmailSignInButton";
 import SignInModal from "./SignInModal";
 import SignUpModal from "./SignUpModal";
 
-interface AuthButtonsProps {
-	onAuthSuccess: (user: any) => void;
-}
-
-export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
+export default function AuthButtons() {
 	const [isAppleAvailable, setIsAppleAvailable] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [showSignInModal, setShowSignInModal] = useState(false);
@@ -29,8 +25,7 @@ export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
 	const handleGoogleSignIn = async () => {
 		setLoading(true);
 		try {
-			const { user } = await authService.signInWithGoogle();
-			onAuthSuccess(user);
+			await authService.signInWithGoogle();
 		} catch (error) {
 			Alert.alert("Sign In Error", "Failed to sign in with Google");
 		} finally {
@@ -41,8 +36,7 @@ export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
 	const handleAppleSignIn = async () => {
 		setLoading(true);
 		try {
-			const { user } = await authService.signInWithApple();
-			onAuthSuccess(user);
+			await authService.signInWithApple();
 		} catch (error) {
 			Alert.alert("Sign In Error", "Failed to sign in with Apple");
 		} finally {
@@ -74,7 +68,6 @@ export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
 			<SignInModal
 				visible={showSignInModal}
 				onClose={() => setShowSignInModal(false)}
-				onAuthSuccess={onAuthSuccess}
 				onSwitchToSignUp={() => {
 					setShowSignInModal(false);
 					setShowSignUpModal(true);
@@ -84,7 +77,6 @@ export default function AuthButtons({ onAuthSuccess }: AuthButtonsProps) {
 			<SignUpModal
 				visible={showSignUpModal}
 				onClose={() => setShowSignUpModal(false)}
-				onAuthSuccess={onAuthSuccess}
 				onSwitchToSignIn={() => {
 					setShowSignUpModal(false);
 					setShowSignInModal(true);

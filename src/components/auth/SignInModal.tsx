@@ -24,14 +24,12 @@ import { PlatformType } from "../../types";
 interface SignInModalProps {
 	visible: boolean;
 	onClose: () => void;
-	onAuthSuccess: (user: any) => void;
 	onSwitchToSignUp: () => void;
 }
 
 export default function SignInModal({
 	visible,
 	onClose,
-	onAuthSuccess,
 	onSwitchToSignUp,
 }: SignInModalProps) {
 	const [loading, setLoading] = useState(false);
@@ -65,10 +63,7 @@ export default function SignInModal({
 				data.email.trim(),
 				data.password
 			);
-			if (user) {
-				onAuthSuccess(user);
-				handleClose();
-			}
+			if (user) handleClose();
 		} catch (error: any) {
 			authLogger.error("Email sign in failed: " + error.message);
 			Alert.alert("Error", error.message || "Failed to sign in");
@@ -154,7 +149,7 @@ export default function SignInModal({
 											color="#64748b"
 										/>
 									}
-                  onPressSuffix={() => setShowPassword(!showPassword)}
+									onPressSuffix={() => setShowPassword(!showPassword)}
 								/>
 
 								<TouchableOpacity
@@ -262,4 +257,3 @@ const styles = StyleSheet.create({
 		fontWeight: "600",
 	},
 });
-
