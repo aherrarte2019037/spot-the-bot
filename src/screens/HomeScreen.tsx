@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { authService } from '../services';
 import AuthButtons from '../components/auth/AuthButtons';
+import { Avatar } from '../components/common';
 import { useAuthContext } from '../contexts/AuthContext';
 import { authLogger } from '../utils/logger';
 
@@ -47,6 +48,7 @@ export default function HomeScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Can you spot the AI?</Text>
           
           <View style={styles.userInfo}>
+            <Avatar user={user} size={60} />
             <Text style={styles.welcomeText}>Welcome, {user.username}!</Text>
             <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
               <Text style={styles.signOutText}>Sign Out</Text>
@@ -143,6 +145,7 @@ const styles = StyleSheet.create({
   userInfo: {
     alignItems: 'center',
     marginBottom: 24,
+    gap: 12,
   },
   welcomeText: {
     color: '#f8fafc',
