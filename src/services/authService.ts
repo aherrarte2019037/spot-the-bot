@@ -79,7 +79,7 @@ export const authService = {
         email,
         password,
         options: {
-          data: { username }
+          data: { user_name: username }
         }
       });
 

@@ -61,11 +61,12 @@ export default function SignUpModal({
 		setLoading(true);
 
 		try {
-			const { user } = await authService.signUpWithEmail(
+			await authService.signUpWithEmail(
 				data.email.trim(),
 				data.password,
 				data.username.trim()
 			);
+
 			Alert.alert(
 				"Success",
 				"Account created! Please check your email to verify your account.",
