@@ -2,7 +2,7 @@ import { supabase } from '../core/supabase';
 import { GoogleSignin, isSuccessResponse } from '@react-native-google-signin/google-signin';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { Platform } from 'react-native';
-import { authLogger, commonLogger } from '../utils/logger';
+import { authLogger } from '../utils/logger';
 import { PlatformType } from '../types';
 import { oauthConfig } from '../core';
 
@@ -117,7 +117,11 @@ export const authService = {
 
   async signOut() {
     try {
-      await GoogleSignin.signOut();
+      try {
+        await GoogleSignin.signOut();
+      } catch (error) {
+        authLogger.info('Google sign-out skipped (not signed in with Google)');
+      }
 
       const { error } = await supabase.auth.signOut();
       if (error) {
