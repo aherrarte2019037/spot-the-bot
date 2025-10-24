@@ -5,11 +5,12 @@ import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { authService } from '../services';
 import AuthButtons from '../components/auth/AuthButtons';
 import { Avatar } from '../components/common';
+import OnboardingScreen from './OnboardingScreen';
 import { useAuthContext } from '../contexts/AuthContext';
 import { authLogger } from '../utils/logger';
 
 export default function HomeScreen({ navigation }: any) {
-  const { user, isLoading, isLoggedIn } = useAuthContext();
+  const { profile, isLoading, isLoggedIn, refreshProfile } = useAuthContext();
 
   const handleSignOut = async () => {
     try {
@@ -37,6 +38,17 @@ export default function HomeScreen({ navigation }: any) {
     );
   }
 
+  if (!profile.onboardingCompleted) {
+    return (
+      <OnboardingScreen
+        userId={profile.id}
+        onComplete={async () => {
+          await refreshProfile();
+        }}
+      />
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       <LinearGradient
@@ -48,8 +60,8 @@ export default function HomeScreen({ navigation }: any) {
           <Text style={styles.subtitle}>Can you spot the AI?</Text>
           
           <View style={styles.userInfo}>
-            <Avatar user={user} size={60} />
-            <Text style={styles.welcomeText}>Welcome, {user.username}!</Text>
+            <Avatar profile={profile} size={60} />
+            <Text style={styles.welcomeText}>Welcome, {profile.username}!</Text>
             <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
               <Text style={styles.signOutText}>Sign Out</Text>
             </TouchableOpacity>
