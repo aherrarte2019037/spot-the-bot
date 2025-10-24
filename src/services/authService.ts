@@ -73,14 +73,11 @@ export const authService = {
   },
 
   // Email/Password Sign Up
-  async signUpWithEmail(email: string, password: string, username: string) {
+  async signUpWithEmail(email: string, password: string) {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: { user_name: username }
-        }
       });
 
       if (error) {
@@ -134,7 +131,7 @@ export const authService = {
     }
   },
 
-  getCurrentUser() {
+  getCurrentProfile() {
     return supabase.auth.getUser();
   },
 

@@ -1,13 +1,15 @@
-export interface User {
+export interface Profile {
   id: string;
   username: string;
   email: string;
   avatarUrl: string;
+  onboardingCompleted: boolean;
 }
 
-export const EmptyUser: User = {
+export const EmptyProfile: Profile = {
   id: '',
   username: '',
   email: '',
   avatarUrl: '',
+  onboardingCompleted: false,
 };

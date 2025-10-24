@@ -45,7 +45,6 @@ export default function SignUpModal({
 		defaultValues: {
 			email: "",
 			password: "",
-			username: "",
 			confirmPassword: "",
 		},
 		mode: "onBlur",
@@ -63,8 +62,7 @@ export default function SignUpModal({
 		try {
 			await authService.signUpWithEmail(
 				data.email.trim(),
-				data.password,
-				data.username.trim()
+				data.password
 			);
 
 			Alert.alert(
@@ -129,17 +127,6 @@ export default function SignUpModal({
 							</View>
 
 							<View style={styles.form}>
-								<FormInput
-									control={control}
-									name="username"
-									prefix={
-										<Ionicons name="person-outline" size={20} color="#64748b" />
-									}
-									placeholder="Username"
-									error={errors.username}
-									editable={!loading}
-								/>
-
 								<FormInput
 									control={control}
 									name="email"

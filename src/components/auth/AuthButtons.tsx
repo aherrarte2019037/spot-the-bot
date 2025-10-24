@@ -82,6 +82,7 @@ export default function AuthButtons() {
 					setShowSignInModal(true);
 				}}
 			/>
+
 		</View>
 	);
 }

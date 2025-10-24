@@ -2,20 +2,20 @@ import React from 'react';
 import { Image, View, StyleSheet } from 'react-native';
 
 interface AvatarProps {
-  user: {
+  profile: {
     avatarUrl: string;
   };
   size?: number;
 }
 
 export default function Avatar({ 
-  user, 
+  profile, 
   size = 40
 }: AvatarProps) {
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Image
-        source={{ uri: user.avatarUrl }}
+        source={{ uri: profile.avatarUrl }}
         style={[styles.image, { width: size, height: size }]}
         resizeMode="cover"
       />

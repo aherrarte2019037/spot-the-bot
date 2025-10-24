@@ -1,14 +1,14 @@
 import { supabase } from '../core/supabase';
-import { User } from '../types';
+import { Profile } from '../types';
 import { authLogger } from '../utils/logger';
 
 export const profileService = {
-  async get(userId: string): Promise<User | null> {
+  async get(profileId: string): Promise<Profile | null> {
     try {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', userId)
+        .eq('id', profileId)
         .single();
 
       if (error) {
@@ -21,6 +21,7 @@ export const profileService = {
         username: data.user_name,
         email: data.email,
         avatarUrl: data.avatar_url,
+        onboardingCompleted: data.onboarding_completed,
       };
     } catch (error) {
       authLogger.error('Error in getProfile:', error);
@@ -28,7 +29,7 @@ export const profileService = {
     }
   },
 
-  async update(userId: string, updates: Partial<Omit<User, 'id'>>): Promise<boolean> {
+  async update(profileId: string, updates: Partial<Omit<Profile, 'id'>>): Promise<boolean> {
     try {
       const { error } = await supabase
         .from('profiles')
@@ -36,9 +37,10 @@ export const profileService = {
           user_name: updates.username,
           email: updates.email,
           avatar_url: updates.avatarUrl,
+          onboarding_completed: updates.onboardingCompleted,
           updated_at: new Date().toISOString(),
         })
-        .eq('id', userId);
+        .eq('id', profileId);
 
       if (error) {
         authLogger.error('Error updating profile:', error);
@@ -52,15 +54,16 @@ export const profileService = {
     }
   },
 
-  async create(userId: string, userData: Omit<User, 'id'>): Promise<boolean> {
+  async create(profileId: string, profileData: Omit<Profile, 'id'>): Promise<boolean> {
     try {
       const { error } = await supabase
         .from('profiles')
         .insert({
-          id: userId,
-          user_name: userData.username,
-          email: userData.email,
-          avatar_url: userData.avatarUrl,
+          id: profileId,
+          user_name: profileData.username,
+          email: profileData.email,
+          avatar_url: profileData.avatarUrl,
+          onboarding_completed: profileData.onboardingCompleted,
         });
 
       if (error) {
@@ -75,12 +78,12 @@ export const profileService = {
     }
   },
 
-  async delete(userId: string): Promise<boolean> {
+  async delete(profileId: string): Promise<boolean> {
     try {
       const { error } = await supabase
         .from('profiles')
         .delete()
-        .eq('id', userId);
+        .eq('id', profileId);
 
       if (error) {
         authLogger.error('Error deleting profile:', error);

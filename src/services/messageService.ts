@@ -24,7 +24,7 @@ export const messageService = {
         *,
         player:game_players(
           *,
-          user:users(*)
+          profile:profiles(*)
         )
       `)
       .eq('game_id', gameId)

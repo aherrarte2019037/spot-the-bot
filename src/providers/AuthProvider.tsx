@@ -3,7 +3,7 @@ import { Session } from "@supabase/supabase-js";
 import * as SplashScreen from "expo-splash-screen";
 import { supabase } from "../core/supabase";
 import { AuthContext, AuthData } from "../contexts/AuthContext";
-import { User, EmptyUser } from "../types";
+import { Profile, EmptyProfile } from "../types";
 import { authLogger } from "../utils/logger";
 import { profileService } from "../services/profileService";
 import { authService } from "../services";
@@ -16,30 +16,30 @@ export default function AuthProvider({
 	children: React.ReactNode;
 }) {
 	const [session, setSession] = useState<Session | null>(null);
-	const [user, setUser] = useState<User>(EmptyUser);
+	const [profile, setProfile] = useState<Profile>(EmptyProfile);
 	const [isLoading, setIsLoading] = useState(true);
 
-	const loadUserProfile = async (userId: string): Promise<User> => {
+	const loadProfile = async (profileId: string): Promise<Profile> => {
 		try {
-			const profileUser = await profileService.get(userId);
-			if (profileUser) {
-				return profileUser;
+			const profileData = await profileService.get(profileId);
+			if (profileData) {
+				return profileData;
 			}
 
-			authLogger.error("User profile not found, signing out");
+			authLogger.error("Profile not found, signing out");
 			await authService.signOut();
-			return EmptyUser;
+			return EmptyProfile;
 		} catch (error) {
-			authLogger.error("Error loading user profile:", error);
+			authLogger.error("Error loading profile:", error);
 			await authService.signOut();
-			return EmptyUser;
+			return EmptyProfile;
 		}
 	};
 
-	const refreshUserProfile = async () => {
+	const refreshProfile = async () => {
 		if (session && session.user) {
-			const updatedProfile = await loadUserProfile(session.user.id);
-			setUser(updatedProfile);
+			const updatedProfile = await loadProfile(session.user.id);
+			setProfile(updatedProfile);
 		}
 	};
 
@@ -56,10 +56,10 @@ export default function AuthProvider({
 				} else {
 					setSession(session);
 					if (session && session.user) {
-						const userProfile = await loadUserProfile(session.user.id);
-						setUser(userProfile);
+						const profile = await loadProfile(session.user.id);
+						setProfile(profile);
 					} else {
-						setUser(EmptyUser);
+						setProfile(EmptyProfile);
 					}
 				}
 			} catch (error) {
@@ -79,10 +79,10 @@ export default function AuthProvider({
 
 			setSession(session);
 			if (session?.user) {
-				const userProfile = await loadUserProfile(session.user.id);
-				setUser(userProfile);
+				const profile = await loadProfile(session.user.id);
+				setProfile(profile);
 			} else {
-				setUser(EmptyUser);
+				setProfile(EmptyProfile);
 			}
 			setIsLoading(false);
 		});
@@ -94,10 +94,10 @@ export default function AuthProvider({
 
 	const authData: AuthData = {
 		session,
-		user,
+		profile,
 		isLoading,
-		isLoggedIn: !!session && !!user,
-		refreshUser: refreshUserProfile,
+		isLoggedIn: !!session && !!profile,
+		refreshProfile,
 	};
 
 	return (

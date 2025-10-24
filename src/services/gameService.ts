@@ -22,12 +22,12 @@ export const gameService = {
     }
   },
 
-  async joinGame(gameId: number, userId: number): Promise<any> {
+  async joinGame(gameId: number, profileId: number): Promise<any> {
     const { data, error } = await supabase
       .from('game_players')
       .insert({ 
         game_id: gameId, 
-        user_id: userId, 
+        profile_id: profileId, 
         is_bot: false 
       })
       .select()
@@ -44,7 +44,7 @@ export const gameService = {
         *,
         players:game_players(
           *,
-          user:users(*)
+          profile:profiles(*)
         ),
         messages(*)
       `)
