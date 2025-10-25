@@ -3,7 +3,7 @@ export interface Profile {
   username: string;
   email: string;
   avatarUrl: string;
-  onboardingCompleted: boolean;
+  onboardingComplete: boolean;
 }
 
 export const EmptyProfile: Profile = {
@@ -11,5 +11,5 @@ export const EmptyProfile: Profile = {
   username: '',
   email: '',
   avatarUrl: '',
-  onboardingCompleted: false,
+  onboardingComplete: false,
 };

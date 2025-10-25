@@ -21,7 +21,7 @@ export const profileService = {
         username: data.user_name,
         email: data.email,
         avatarUrl: data.avatar_url,
-        onboardingCompleted: data.onboarding_completed,
+        onboardingComplete: data.onboarding_complete,
       };
     } catch (error) {
       authLogger.error('Error in getProfile:', error);
@@ -37,7 +37,7 @@ export const profileService = {
           user_name: updates.username,
           email: updates.email,
           avatar_url: updates.avatarUrl,
-          onboarding_completed: updates.onboardingCompleted,
+          onboarding_complete: updates.onboardingComplete,
           updated_at: new Date().toISOString(),
         })
         .eq('id', profileId);
@@ -63,7 +63,7 @@ export const profileService = {
           user_name: profileData.username,
           email: profileData.email,
           avatar_url: profileData.avatarUrl,
-          onboarding_completed: profileData.onboardingCompleted,
+          onboarding_complete: profileData.onboardingComplete,
         });
 
       if (error) {

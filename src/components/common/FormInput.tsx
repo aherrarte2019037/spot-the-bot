@@ -16,6 +16,7 @@ interface FormInputProps extends Omit<TextInputProps, "onChangeText" | "onBlur" 
 	suffix?: React.ReactNode;
 	error?: FieldError;
   onPressSuffix?: VoidFunction;
+  autoCapitalize?: "none" | "sentences" | "words" | "characters";
 }
 
 export default function FormInput({
@@ -25,6 +26,7 @@ export default function FormInput({
 	suffix,
 	error,
 	onPressSuffix,
+	autoCapitalize = "none",
 	...textInputProps
 }: FormInputProps) {
 	return (
@@ -41,6 +43,7 @@ export default function FormInput({
 							value={value}
 							onChangeText={onChange}
 							onBlur={onBlur}
+							autoCapitalize={autoCapitalize}
 							{...textInputProps}
 						/>
 						{suffix && (
