@@ -22,6 +22,10 @@ export const profileService = {
         email: data.email,
         avatarUrl: data.avatar_url,
         onboardingComplete: data.onboarding_complete,
+        xp: data.xp,
+        level: data.level,
+        gamesPlayed: data.games_played,
+        gamesWon: data.games_won,
       };
     } catch (error) {
       authLogger.error('Error in getProfile:', error);
@@ -31,15 +35,22 @@ export const profileService = {
 
   async update(profileId: string, updates: Partial<Omit<Profile, 'id'>>): Promise<boolean> {
     try {
+      const updateData: any = {
+        updated_at: new Date().toISOString(),
+      };
+
+      if (updates.username !== undefined) updateData.user_name = updates.username;
+      if (updates.email !== undefined) updateData.email = updates.email;
+      if (updates.avatarUrl !== undefined) updateData.avatar_url = updates.avatarUrl;
+      if (updates.onboardingComplete !== undefined) updateData.onboarding_complete = updates.onboardingComplete;
+      if (updates.xp !== undefined) updateData.xp = updates.xp;
+      if (updates.level !== undefined) updateData.level = updates.level;
+      if (updates.gamesPlayed !== undefined) updateData.games_played = updates.gamesPlayed;
+      if (updates.gamesWon !== undefined) updateData.games_won = updates.gamesWon;
+
       const { error } = await supabase
         .from('profiles')
-        .update({
-          user_name: updates.username,
-          email: updates.email,
-          avatar_url: updates.avatarUrl,
-          onboarding_complete: updates.onboardingComplete,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', profileId);
 
       if (error) {
@@ -64,6 +75,10 @@ export const profileService = {
           email: profileData.email,
           avatar_url: profileData.avatarUrl,
           onboarding_complete: profileData.onboardingComplete,
+          xp: profileData.xp,
+          level: profileData.level,
+          games_played: profileData.gamesPlayed,
+          games_won: profileData.gamesWon,
         });
 
       if (error) {
