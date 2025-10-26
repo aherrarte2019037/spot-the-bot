@@ -2,3 +2,4 @@ export { type ExtraConfig, type SupabaseConfig, type OAuthConfig } from './confi
 export { PlatformType } from './platform';
 export { type Profile, EmptyProfile } from './profile';
 export { SocialAuthProvider } from './socialAuthProvider';
+export { NavigationRoutes, type AuthStackParamList, type AppStackParamList, type AuthStackScreenProps, type AppStackScreenProps } from './navigation';
