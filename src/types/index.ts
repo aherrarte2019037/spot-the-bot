@@ -10,5 +10,6 @@ export {
   type BotPersonality, 
   type Message, 
   type Vote, 
-  type Topic 
+  type Topic,
+  EmptyGame
 } from './game';

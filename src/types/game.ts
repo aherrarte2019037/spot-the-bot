@@ -56,3 +56,20 @@ export interface Topic {
   category: string;
   createdAt: string;
 }
+
+export const EmptyGame: Game = {
+  id: 0,
+  status: 'waiting',
+  topic: '',
+  topicId: null,
+  maxPlayers: 7,
+  botCount: 0,
+  botPlayerIds: [],
+  createdAt: '',
+  updatedAt: '',
+  startedAt: null,
+  endedAt: null,
+  chatDuration: 120,
+  players: [],
+  messages: [],
+};

@@ -1,12 +1,20 @@
 import { supabase } from '../core/supabase';
 import { gameLogger } from '../utils/logger';
+import { Game, GamePlayer, Message } from '../types';
 
 export const gameService = {
-  async createGame(): Promise<any> {
+  async createGame(gameData: {
+    status: string;
+    topic?: string;
+    topicId?: number;
+    maxPlayers?: number;
+    botCount?: number;
+    chatDuration?: number;
+  }): Promise<any> {
     try {
       const { data, error } = await supabase
         .from('games')
-        .insert({ status: 'waiting' })
+        .insert({ ...gameData })
         .select()
         .single();
       
@@ -22,7 +30,7 @@ export const gameService = {
     }
   },
 
-  async joinGame(gameId: number, profileId: number): Promise<any> {
+  async joinGame(gameId: number, profileId: string): Promise<any> {
     const { data, error } = await supabase
       .from('game_players')
       .insert({ 
@@ -37,14 +45,14 @@ export const gameService = {
     return data;
   },
 
-  async getGame(gameId: number): Promise<any> {
+  async getGame(gameId: number): Promise<Game> {
     const { data, error } = await supabase
       .from('games')
       .select(`
         *,
         players:game_players(
           *,
-          profile:profiles(*)
+          profile:profiles(id, user_name, email, avatar_url)
         ),
         messages(*)
       `)
@@ -52,7 +60,44 @@ export const gameService = {
       .single();
     
     if (error) throw error;
-    return data;
+    
+    return {
+      id: data.id,
+      status: data.status,
+      topic: data.topic || '',
+      topicId: data.topic_id,
+      maxPlayers: data.max_players || 7,
+      botCount: data.bot_count || 2,
+      botPlayerIds: data.bot_player_ids || [],
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+      startedAt: data.started_at,
+      endedAt: data.ended_at,
+      chatDuration: data.chat_duration || 120,
+      players: (data.players || []).map((p: any) => ({
+        id: p.id,
+        gameId: p.game_id,
+        profileId: p.profile_id,
+        profile: p.profile ? {
+          username: p.profile.user_name,
+          email: p.profile.email,
+          avatarUrl: p.profile.avatar_url,
+        } : null,
+        isBot: p.is_bot,
+        botPersonality: p.bot_personality,
+        score: p.score || 0,
+        createdAt: p.created_at,
+      })),
+      messages: (data.messages || []).map((m: any) => ({
+        id: m.id,
+        gameId: m.game_id,
+        playerId: m.player_id,
+        player: null, // TODO: join player data
+        content: m.content,
+        isBot: m.is_bot,
+        createdAt: m.created_at,
+      })),
+    };
   },
 
   async subscribeToGame(gameId: number, callback: (game: any) => void) {
