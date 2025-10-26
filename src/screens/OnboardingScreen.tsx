@@ -46,21 +46,31 @@ export default function OnboardingScreen({ navigation }: Props) {
 		setLoading(true);
 
 		try {
-			const success = await profileService.update(profile.id, {
+			await profileService.update(profile.id, {
 				username: data.username.trim(),
-				onboardingComplete: true,
 			});
 
-			if (!success) {
-				Alert.alert("Error", "Failed to set up username. Please try again.");
-				return;
-			}
-
-			refreshProfile();
 			nextStep();
 		} catch (error) {
 			authLogger.error("Username setup failed: ", error);
 			Alert.alert("Error", "Failed to set up username. Please try again.");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleCompleteOnboarding = async () => {
+		setLoading(true);
+
+		try {
+			await profileService.update(profile.id, {
+				onboardingComplete: true,
+			});
+
+			await refreshProfile();
+		} catch (error) {
+			authLogger.error("Onboarding completion failed: ", error);
+			Alert.alert("Error", "Failed to complete onboarding. Please try again.");
 		} finally {
 			setLoading(false);
 		}
@@ -221,10 +231,16 @@ export default function OnboardingScreen({ navigation }: Props) {
 
 						<TouchableOpacity
 							style={styles.primaryButton}
-							onPress={() => navigation.navigate(NavigationRoutes.Home)}
+							onPress={handleCompleteOnboarding}
 						>
-							<Text style={styles.buttonText}>Start Playing</Text>
-							<Ionicons name="play" size={20} color="#fff" />
+							{loading ? (
+								<ActivityIndicator color="#fff" />
+							) : (
+								<>
+									<Text style={styles.buttonText}>Start Playing</Text>
+									<Ionicons name="play" size={20} color="#fff" />
+								</>
+							)}
 						</TouchableOpacity>
 					</View>
 				);

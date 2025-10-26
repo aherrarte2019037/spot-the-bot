@@ -71,8 +71,14 @@ export default function RootNavigator() {
 				</>
 			);
 		}
-
-		return null;
+    
+		return (
+			<RootStack.Screen
+				name={NavigationRoutes.SignIn}
+				component={SignInScreen}
+				options={{ headerShown: false }}
+			/>
+		);
 	};
 
 	if (isLoading) {

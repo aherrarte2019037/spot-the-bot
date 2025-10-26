@@ -11,6 +11,10 @@ if (!config.googleWebClientId) {
   throw new Error('Missing Google Web Client ID');
 }
 
+if (!config.googleIOSClientId) {
+  throw new Error('Missing Google iOS Client ID');
+}
+
 export const supabaseConfig: SupabaseConfig = {
   url: config.supabaseUrl,
   key: config.supabaseAnonKey,
@@ -18,4 +22,5 @@ export const supabaseConfig: SupabaseConfig = {
 
 export const oauthConfig: OAuthConfig = {
   googleWebClientId: config.googleWebClientId,
+  googleIOSClientId: config.googleIOSClientId,
 }
