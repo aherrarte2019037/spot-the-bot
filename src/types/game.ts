@@ -1,75 +1,29 @@
-import { GameProfile } from "./profile";
+import { Tables } from './database.types';
+import { GameProfile } from './profile';
 
-export interface Game {
-  id: number;
-  status: GameStatus;
-  topic: string;
-  topicId: number | null;
-  maxPlayers: number;
-  botCount: number;
-  botPlayerIds: string[];
-  createdAt: string;
-  updatedAt: string;
-  startedAt: string | null;
-  endedAt: string | null;
-  chatDuration: number;
-  players: GamePlayer[];
-  messages: Message[];
-}
+export type Game = Tables<'games'>;
+export type GamePlayer = Tables<'game_players'>;
+export type Message = Tables<'messages'>;
+export type Vote = Tables<'votes'>;
+export type Topic = Tables<'topics'>;
 
 export type GameStatus = 'waiting' | 'chatting' | 'voting' | 'completed';
-
-export interface GamePlayer {
-  id: number;
-  gameId: number;
-  profileId: string | null;
-  profile: GameProfile | null;
-  isBot: boolean;
-  botPersonality: BotPersonality | null;
-  score: number;
-  createdAt: string;
-}
-
 export type BotPersonality = 'casual' | 'formal' | 'quirky';
 
-export interface Message {
-  id: number;
-  gameId: number;
-  playerId: number;
+export type GameWithPlayers = Game & {
+  players: GamePlayerWithProfile[];
+  messages: MessageWithPlayer[];
+};
+
+export type GamePlayerWithProfile = GamePlayer & {
+  profile: GameProfile | null;
+};
+
+export type MessageWithPlayer = Message & {
   player: GamePlayer | null;
-  content: string;
-  isBot: boolean;
-  createdAt: string;
-}
+};
 
-export interface Vote {
-  id: number;
-  gameId: number;
-  voterId: number;
-  targetId: number;
-  createdAt: string;
-}
-
-export interface Topic {
-  id: number;
-  topic: string;
-  category: string;
-  createdAt: string;
-}
-
-export const EmptyGame: Game = {
-  id: 0,
-  status: 'waiting',
-  topic: '',
-  topicId: null,
-  maxPlayers: 7,
-  botCount: 0,
-  botPlayerIds: [],
-  createdAt: '',
-  updatedAt: '',
-  startedAt: null,
-  endedAt: null,
-  chatDuration: 120,
-  players: [],
-  messages: [],
+export type VoteWithRelations = Vote & {
+  voter: GamePlayer;
+  target: GamePlayer;
 };

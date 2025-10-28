@@ -1,7 +1,8 @@
 import { supabase } from '../core/supabase';
+import { Topic } from '../types';
 
 export const topicService = {
-  async getRandomTopic(): Promise<any> {
+  async getRandom(): Promise<Topic> {
     const { data, error } = await supabase
       .from('topics')
       .select('*')
@@ -13,7 +14,7 @@ export const topicService = {
     return data;
   },
 
-  async getAllTopics(): Promise<any[]> {
+  async getAll(): Promise<Topic[]> {
     const { data, error } = await supabase
       .from('topics')
       .select('*')
@@ -23,7 +24,7 @@ export const topicService = {
     return data;
   },
 
-  async getTopicsByCategory(category: string): Promise<any[]> {
+  async getByCategory(category: string): Promise<Topic[]> {
     const { data, error } = await supabase
       .from('topics')
       .select('*')

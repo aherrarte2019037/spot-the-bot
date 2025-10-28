@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import { supabaseConfig } from './config';
 import * as SecureStore from 'expo-secure-store';
 import 'react-native-url-polyfill/auto';
+import { Database } from '../types/database.types';
 
 const ExpoSecureStoreAdapter = {
   getItem: (key: string) => {
@@ -15,7 +16,7 @@ const ExpoSecureStoreAdapter = {
   },
 };
 
-export const supabase = createClient(
+export const supabase = createClient<Database>(
   supabaseConfig.url,
   supabaseConfig.key,
   {

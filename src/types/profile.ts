@@ -1,29 +1,23 @@
-export interface Profile {
-  id: string;
-  username: string;
-  email: string;
-  avatarUrl: string;
-  onboardingComplete: boolean;
-  xp: number;
-  level: number;
-  gamesPlayed: number;
-  gamesWon: number;
-}
+import { Tables } from './database.types';
 
-export interface GameProfile {
-  username: string;
+export type Profile = Tables<'profiles'>;
+
+export type GameProfile = {
+  user_name: string;
   email: string;
-  avatarUrl: string;
-}
+  avatar_url: string;
+};
 
 export const EmptyProfile: Profile = {
   id: '',
-  username: '',
+  user_name: '',
   email: '',
-  avatarUrl: '',
-  onboardingComplete: false,
+  avatar_url: '',
+  onboarding_complete: false,
   xp: 0,
   level: 1,
-  gamesPlayed: 0,
-  gamesWon: 0,
+  games_played: 0,
+  games_won: 0,
+  created_at: '',
+  updated_at: '',
 };

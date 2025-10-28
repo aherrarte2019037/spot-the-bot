@@ -1,14 +1,17 @@
 import { supabase } from '../core/supabase';
+import { Vote } from '../types';
+
+export interface SubmitVoteData {
+  game_id: number;
+  voter_id: number;
+  target_id: number;
+}
 
 export const voteService = {
-  async submitVote(gameId: number, voterId: number, targetId: number): Promise<any> {
+  async submit(submitVoteData: SubmitVoteData): Promise<Vote> {
     const { data, error } = await supabase
       .from('votes')
-      .insert({
-        game_id: gameId,
-        voter_id: voterId,
-        target_id: targetId
-      })
+      .insert(submitVoteData)
       .select()
       .single();
     
@@ -16,7 +19,7 @@ export const voteService = {
     return data;
   },
 
-  async getVotes(gameId: number): Promise<any[]> {
+  async getByGameId(gameId: number): Promise<Vote[]> {
     const { data, error } = await supabase
       .from('votes')
       .select('*')
