@@ -3,7 +3,7 @@ import { Image, View, StyleSheet } from 'react-native';
 
 interface AvatarProps {
   profile: {
-    avatarUrl: string;
+    avatar_url: string;
   };
   size?: number;
 }
@@ -15,7 +15,7 @@ export default function Avatar({
   return (
     <View style={[styles.container, { width: size, height: size }]}>
       <Image
-        source={{ uri: profile.avatarUrl }}
+        source={{ uri: profile.avatar_url }}
         style={[styles.image, { width: size, height: size }]}
         resizeMode="cover"
       />

@@ -38,7 +38,7 @@ export default function HomeScreen({ navigation }: Props) {
 
 				<View style={styles.userInfo}>
 					<Avatar profile={profile} size={60} />
-					<Text style={styles.welcomeText}>Welcome, {profile.username}!</Text>
+					<Text style={styles.welcomeText}>Welcome, {profile.user_name}!</Text>
 					<TouchableOpacity
 						style={styles.signOutButton}
 						onPress={handleSignOut}

@@ -16,8 +16,8 @@ export default function RootNavigator() {
 	const { isLoading, isLoggedIn, profile } = useAuthContext();
 
 	const isSignedOut = !isLoggedIn && !isLoading;
-	const needsOnboarding = !isLoading && profile && profile.id && !profile.onboardingComplete;
-	const onboardingComplete = !isLoading && profile && profile.id && profile.onboardingComplete;
+	const needsOnboarding = !isLoading && profile && profile.id && !profile.onboarding_complete;
+	const onboardingComplete = !isLoading && profile && profile.id && profile.onboarding_complete;
 
 	const screenOptions = {
 		headerStyle: { backgroundColor: "#1e293b" },

@@ -47,7 +47,7 @@ export default function OnboardingScreen({ navigation }: Props) {
 
 		try {
 			await profileService.update(profile.id, {
-				username: data.username.trim(),
+				user_name: data.username.trim(),
 			});
 
 			nextStep();
@@ -64,7 +64,7 @@ export default function OnboardingScreen({ navigation }: Props) {
 
 		try {
 			await profileService.update(profile.id, {
-				onboardingComplete: true,
+				onboarding_complete: true,
 			});
 
 			await refreshProfile();
