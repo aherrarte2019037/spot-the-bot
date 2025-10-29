@@ -1,4 +1,4 @@
-import { Tables } from './database.types';
+import { Enums, Tables } from './database.types';
 import { GameProfile } from './profile';
 
 export type Game = Tables<'games'>;
@@ -7,8 +7,10 @@ export type Message = Tables<'messages'>;
 export type Vote = Tables<'votes'>;
 export type Topic = Tables<'topics'>;
 
-export type GameStatus = 'waiting' | 'chatting' | 'voting' | 'completed';
-export type BotPersonality = 'casual' | 'formal' | 'quirky';
+export type GameStatus = Enums<'game_status'>;
+export type BotPersonality = Enums<'bot_personality'>;
+export type MatchmakingStatus = "searching" | "found" | "starting";
+export type TopicCategory = Enums<'topic_category'>;
 
 export type GameWithPlayers = Game & {
   players: GamePlayerWithProfile[];

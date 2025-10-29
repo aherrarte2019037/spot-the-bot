@@ -16,7 +16,7 @@ export type Database = {
     Tables: {
       game_players: {
         Row: {
-          bot_personality: string | null
+          bot_personality: Database["public"]["Enums"]["bot_personality"]
           created_at: string
           game_id: number | null
           id: number
@@ -25,7 +25,7 @@ export type Database = {
           score: number | null
         }
         Insert: {
-          bot_personality?: string | null
+          bot_personality?: Database["public"]["Enums"]["bot_personality"]
           created_at?: string
           game_id?: number | null
           id?: number
@@ -34,7 +34,7 @@ export type Database = {
           score?: number | null
         }
         Update: {
-          bot_personality?: string | null
+          bot_personality?: Database["public"]["Enums"]["bot_personality"]
           created_at?: string
           game_id?: number | null
           id?: number
@@ -69,7 +69,7 @@ export type Database = {
           id: number
           max_players: number
           started_at: string | null
-          status: string | null
+          status: Database["public"]["Enums"]["game_status"]
           topic: string | null
           topic_id: number | null
           updated_at: string | null
@@ -83,7 +83,7 @@ export type Database = {
           id?: number
           max_players?: number
           started_at?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["game_status"]
           topic?: string | null
           topic_id?: number | null
           updated_at?: string | null
@@ -97,7 +97,7 @@ export type Database = {
           id?: number
           max_players?: number
           started_at?: string | null
-          status?: string | null
+          status?: Database["public"]["Enums"]["game_status"]
           topic?: string | null
           topic_id?: number | null
           updated_at?: string | null
@@ -198,19 +198,19 @@ export type Database = {
       }
       topics: {
         Row: {
-          category: string | null
+          category: Database["public"]["Enums"]["topic_category"]
           created_at: string
           id: number
           topic: string
         }
         Insert: {
-          category?: string | null
+          category?: Database["public"]["Enums"]["topic_category"]
           created_at?: string
           id?: number
           topic: string
         }
         Update: {
-          category?: string | null
+          category?: Database["public"]["Enums"]["topic_category"]
           created_at?: string
           id?: number
           topic?: string
@@ -269,9 +269,26 @@ export type Database = {
     }
     Functions: {
       calculate_level: { Args: { xp_amount: number }; Returns: number }
+      get_random_topic: {
+        Args: never
+        Returns: {
+          category: Database["public"]["Enums"]["topic_category"]
+          created_at: string
+          id: number
+          topic: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "topics"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
-      [_ in never]: never
+      bot_personality: "none" | "casual" | "formal" | "quirky"
+      game_status: "none" | "waiting" | "chatting" | "voting" | "completed"
+      topic_category: "default"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -398,6 +415,10 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      bot_personality: ["none", "casual", "formal", "quirky"],
+      game_status: ["none", "waiting", "chatting", "voting", "completed"],
+      topic_category: ["default"],
+    },
   },
 } as const

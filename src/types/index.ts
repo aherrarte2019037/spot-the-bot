@@ -11,9 +11,11 @@ export {
   type Message, 
   type Vote, 
   type Topic,
+  type TopicCategory,
   type GameWithPlayers,
   type GamePlayerWithProfile,
   type MessageWithPlayer,
-  type VoteWithRelations
+  type VoteWithRelations,
+  type MatchmakingStatus
 } from './game';
-export { type Database, type Tables, type TablesInsert, type TablesUpdate } from './database.types';
+export { type Database, type Tables, type TablesInsert, type TablesUpdate, type Enums } from './database.types';

@@ -50,18 +50,26 @@ export default function HomeScreen({ navigation }: Props) {
 				<View style={styles.buttonContainer}>
 					<TouchableOpacity
 						style={styles.primaryButton}
-						onPress={() =>
-							navigation.navigate(NavigationRoutes.Game, { gameId: "demo" })
-						}
+						onPress={() => navigation.navigate(NavigationRoutes.Matchmaking)}
 					>
 						<Ionicons name="play" size={24} color="#fff" />
 						<Text style={styles.buttonText}>Start Game</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity style={styles.secondaryButton}>
-						<Ionicons name="people" size={24} color="#6366f1" />
-						<Text style={styles.secondaryButtonText}>Join Room</Text>
-					</TouchableOpacity>
+					<View style={styles.statsContainer}>
+						<View style={styles.statBox}>
+							<Text style={styles.statValue}>{profile.games_played}</Text>
+							<Text style={styles.statLabel}>Games Played</Text>
+						</View>
+						<View style={styles.statBox}>
+							<Text style={styles.statValue}>{profile.games_won}</Text>
+							<Text style={styles.statLabel}>Games Won</Text>
+						</View>
+						<View style={styles.statBox}>
+							<Text style={styles.statValue}>{profile.level}</Text>
+							<Text style={styles.statLabel}>Level</Text>
+						</View>
+					</View>
 				</View>
 			</ScrollView>
 		</LinearGradient>
@@ -145,5 +153,29 @@ const styles = StyleSheet.create({
 	signOutText: {
 		color: "#94a3b8",
 		fontSize: 14,
+	},
+	statsContainer: {
+		flexDirection: "row",
+		justifyContent: "space-around",
+		width: "100%",
+		marginTop: 16,
+	},
+	statBox: {
+		alignItems: "center",
+		backgroundColor: "#1e293b",
+		padding: 16,
+		borderRadius: 12,
+		flex: 1,
+		marginHorizontal: 4,
+	},
+	statValue: {
+		color: "#6366f1",
+		fontSize: 24,
+		fontWeight: "bold",
+	},
+	statLabel: {
+		color: "#94a3b8",
+		fontSize: 12,
+		marginTop: 4,
 	},
 });

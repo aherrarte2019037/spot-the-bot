@@ -5,6 +5,7 @@ export enum NavigationRoutes {
   SignUp = 'SignUp',
   Onboarding = 'Onboarding',
   Home = 'Home',
+  Matchmaking = 'Matchmaking',
   Game = 'Game',
   Results = 'Results',
 }
@@ -20,6 +21,7 @@ export type AuthStackScreenProps<T extends keyof AuthStackParamList> =
 export type AppStackParamList = {
   [NavigationRoutes.Onboarding]: { userId: string };
   [NavigationRoutes.Home]: undefined;
+  [NavigationRoutes.Matchmaking]: undefined;
   [NavigationRoutes.Game]: { gameId: string };
   [NavigationRoutes.Results]: { gameId: string; score: number };
 };

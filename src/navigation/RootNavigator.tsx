@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationRoutes, RootStackParamList } from "../types/navigation";
 import GameScreen from "../screens/GameScreen";
 import HomeScreen from "../screens/HomeScreen";
+import MatchmakingScreen from "../screens/MatchmakingScreen";
 import OnboardingScreen from "../screens/OnboardingScreen";
 import ResultsScreen from "../screens/ResultsScreen";
 import SignInScreen from "../screens/SignInScreen";
@@ -59,6 +60,11 @@ export default function RootNavigator() {
 					<RootStack.Screen
 						name={NavigationRoutes.Home}
 						component={HomeScreen}
+					/>
+					<RootStack.Screen
+						name={NavigationRoutes.Matchmaking}
+						component={MatchmakingScreen}
+						options={{ headerShown: false }}
 					/>
 					<RootStack.Screen
 						name={NavigationRoutes.Game}

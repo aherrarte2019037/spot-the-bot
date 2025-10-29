@@ -1,7 +1,7 @@
 import { supabase } from '../core/supabase';
 import { gameService } from './gameService';
 import { topicService } from './topicService';
-import { GameWithPlayers, BotPersonality, TablesInsert, GameStatus } from '../types';
+import { GameWithPlayers, BotPersonality, TablesInsert } from '../types';
 import { authLogger } from '../utils/logger';
 import { generateBotNames } from '../utils/botNames';
 
