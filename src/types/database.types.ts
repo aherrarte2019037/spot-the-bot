@@ -70,7 +70,7 @@ export type Database = {
           max_players: number
           started_at: string | null
           status: Database["public"]["Enums"]["game_status"]
-          topic: string | null
+          topic: string
           topic_id: number | null
           updated_at: string | null
         }
@@ -84,7 +84,7 @@ export type Database = {
           max_players?: number
           started_at?: string | null
           status?: Database["public"]["Enums"]["game_status"]
-          topic?: string | null
+          topic: string
           topic_id?: number | null
           updated_at?: string | null
         }
@@ -98,7 +98,7 @@ export type Database = {
           max_players?: number
           started_at?: string | null
           status?: Database["public"]["Enums"]["game_status"]
-          topic?: string | null
+          topic?: string
           topic_id?: number | null
           updated_at?: string | null
         }
