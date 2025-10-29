@@ -22,7 +22,7 @@ export type GamePlayerWithProfile = GamePlayer & {
 };
 
 export type MessageWithPlayer = Message & {
-  player: GamePlayer | null;
+  player: GamePlayerWithProfile;
 };
 
 export type VoteWithRelations = Vote & {
