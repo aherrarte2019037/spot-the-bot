@@ -1,50 +1,51 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
 	View,
 	Text,
-	StyleSheet,
-	FlatList,
 	TextInput,
 	TouchableOpacity,
+	FlatList,
+	StyleSheet,
 	ActivityIndicator,
 	Platform,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { LinearGradient } from "expo-linear-gradient";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { gameService, messageService } from "../services";
-import { useAuthContext } from "../contexts/AuthContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Ionicons from "@react-native-vector-icons/ionicons";
+import { useAuthContext } from "../contexts";
 import {
 	AppStackScreenProps,
-	NavigationRoutes,
 	GameWithPlayers,
 	MessageWithPlayer,
+	NavigationRoutes,
 	PlatformType,
 } from "../types";
-import { gameLogger } from "../utils/logger";
-import { RealtimeChannel } from "@supabase/supabase-js";
+import { gameService, messageService } from "../services";
+import { gameLogger } from "../utils";
 import { EmptyMessageList, GameMessage } from "../components/game";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
-import { LegendList } from "@legendapp/list";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { RealtimeChannel } from "@supabase/supabase-js";
+import { LegendList, LegendListRef } from "@legendapp/list";
 
 type Props = AppStackScreenProps<NavigationRoutes.Game>;
 
 export default function GameScreen({ navigation, route }: Props) {
 	const { profile } = useAuthContext();
+	const insets = useSafeAreaInsets();
+	const legendListRef = useRef<LegendListRef>(null);
+	const currentPlayerId = useRef<number>(0);
+
 	const [game, setGame] = useState<GameWithPlayers | null>(null);
 	const [messages, setMessages] = useState<MessageWithPlayer[]>([]);
 	const [message, setMessage] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [sending, setSending] = useState(false);
-	const flatListRef = useRef<FlatList<MessageWithPlayer>>(null);
-	const currentPlayerId = useRef<number | null>(null);
-	const insets = useSafeAreaInsets();
 
-	useEffect(() => {
+	React.useEffect(() => {
 		loadGame();
 	}, []);
 
-	useEffect(() => {
+	React.useEffect(() => {
 		if (!game) return;
 
 		loadMessages();
@@ -59,19 +60,10 @@ export default function GameScreen({ navigation, route }: Props) {
 		};
 
 		setupSubscription();
-
 		return () => {
 			if (subscription) subscription.unsubscribe();
 		};
 	}, [game]);
-
-	useEffect(() => {
-		if (messages.length > 0) {
-			setTimeout(() => {
-				flatListRef.current?.scrollToEnd({ animated: true });
-			}, 100);
-		}
-	}, [messages]);
 
 	const loadGame = async () => {
 		try {
@@ -101,6 +93,10 @@ export default function GameScreen({ navigation, route }: Props) {
 		}
 	};
 
+	const scrollToBottom = () => {
+		legendListRef.current?.scrollToEnd({ animated: true });
+	};
+
 	const enableSendMessage = useMemo(() => {
 		return !sending && !!message.trim();
 	}, [sending, message]);
@@ -116,6 +112,7 @@ export default function GameScreen({ navigation, route }: Props) {
 				content: message.trim(),
 			});
 			setMessage("");
+			scrollToBottom();
 		} catch (error) {
 			gameLogger.error("Failed to send message:", error);
 		} finally {
@@ -134,40 +131,48 @@ export default function GameScreen({ navigation, route }: Props) {
 		);
 	}
 
-	if (!game) return null;
+	if (!game) {
+		return (
+			<LinearGradient colors={["#0f172a", "#1e293b"]} style={styles.container}>
+				<View style={styles.loadingContainer}>
+					<Text style={styles.loadingText}>Failed to load game</Text>
+				</View>
+			</LinearGradient>
+		);
+	}
 
 	const playerCount = game.players.length;
 	const humanCount = playerCount - game.bot_count;
 	const botCount = game.bot_count;
+	const isEmpty = messages.length === 0;
 
 	return (
 		<LinearGradient colors={["#0f172a", "#1e293b"]} style={styles.container}>
-			<View style={{ paddingTop: insets.top }}>
-				<View style={styles.header}>
-					<View style={styles.topicPill}>
-						<Text style={styles.topicLabel}>Topic</Text>
-						<Text style={styles.topicText}>{game.topic}</Text>
+			<View style={[styles.header, { paddingTop: insets.top }]}>
+				<View style={styles.topicPill}>
+					<Text style={styles.topicLabel}>Topic</Text>
+					<Text style={styles.topicText}>{game.topic}</Text>
+				</View>
+				<View style={styles.chipsRow}>
+					<View style={styles.chip}>
+						<Text style={styles.chipText}>Players: {playerCount}</Text>
 					</View>
-					<View style={styles.chipsRow}>
-						<View style={styles.chip}>
-							<Text style={styles.chipText}>Players: {playerCount}</Text>
-						</View>
-						<View style={styles.chip}>
-							<Text style={styles.chipText}>Humans: {humanCount}</Text>
-						</View>
-						<View style={styles.chip}>
-							<Text style={styles.chipText}>Bots: {botCount}</Text>
-						</View>
+					<View style={styles.chip}>
+						<Text style={styles.chipText}>Humans: {humanCount}</Text>
+					</View>
+					<View style={styles.chip}>
+						<Text style={styles.chipText}>Bots: {botCount}</Text>
 					</View>
 				</View>
 			</View>
 
 			<KeyboardAvoidingView
-				style={styles.keyboardAvoidingView}
+				style={styles.container}
 				behavior={Platform.OS === PlatformType.IOS ? "padding" : "height"}
 			>
 				<LegendList
-					contentContainerStyle={styles.legendListContent}
+					ref={legendListRef}
+					style={styles.container}
 					data={messages}
 					renderItem={({ item }) => (
 						<GameMessage
@@ -178,11 +183,16 @@ export default function GameScreen({ navigation, route }: Props) {
 					)}
 					ListEmptyComponent={<EmptyMessageList />}
 					keyExtractor={(item) => item.id.toString()}
-					alignItemsAtEnd
+					contentContainerStyle={[
+						styles.messagesContent,
+						isEmpty && styles.emptyContent,
+					]}
+					onContentSizeChange={scrollToBottom}
+					showsVerticalScrollIndicator={false}
+					maintainScrollAtEndThreshold={0.5}
 					maintainScrollAtEnd
-					maintainVisibleContentPosition
-					estimatedItemSize={100}
 				/>
+
 				<View style={styles.inputContainer}>
 					<TextInput
 						style={styles.textInput}
@@ -225,12 +235,6 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: "#94a3b8",
 	},
-	header: {
-		padding: 16,
-		borderBottomWidth: 1,
-		borderBottomColor: "#334155",
-		gap: 12,
-	},
 	topicPill: {
 		backgroundColor: "#0b1220",
 		borderColor: "#334155",
@@ -254,39 +258,6 @@ const styles = StyleSheet.create({
 		flexWrap: "wrap",
 		gap: 8,
 	},
-	chip: {
-		borderRadius: 999,
-		backgroundColor: "#0b1220",
-		borderWidth: 1,
-		borderColor: "#334155",
-		paddingVertical: 6,
-		paddingHorizontal: 10,
-	},
-	chipText: {
-		fontSize: 12,
-		color: "#94a3b8",
-	},
-	keyboardAvoidingView: {
-		flex: 1,
-	},
-	legendListContent: {
-		flex: 1,
-		gap: 16,
-		padding: 16,
-		paddingBottom: 0,
-	},
-	inputContainer: {
-		position: "static",
-		bottom: 0,
-		left: 0,
-		right: 0,
-		flexDirection: "row",
-		padding: 16,
-		borderTopWidth: 1,
-		borderTopColor: "#334155",
-		alignItems: "flex-end",
-		backgroundColor: "#0f172a",
-	},
 	textInput: {
 		flex: 1,
 		backgroundColor: "#334155",
@@ -309,5 +280,51 @@ const styles = StyleSheet.create({
 	},
 	sendButtonDisabled: {
 		opacity: 0.5,
+	},
+	chip: {
+		borderRadius: 999,
+		backgroundColor: "#0b1220",
+		borderWidth: 1,
+		borderColor: "#334155",
+		paddingVertical: 6,
+		paddingHorizontal: 10,
+	},
+	chipText: {
+		fontSize: 12,
+		color: "#94a3b8",
+	},
+	header: {
+		padding: 16,
+		borderBottomWidth: 1,
+		borderBottomColor: "#334155",
+		gap: 12,
+	},
+	messagesContent: {
+		paddingTop: 16,
+		paddingHorizontal: 12,
+		gap: 16,
+	},
+	inputContainer: {
+		flexDirection: "row",
+		padding: 16,
+		borderTopWidth: 1,
+		borderTopColor: "#334155",
+		alignItems: "flex-end",
+		backgroundColor: "#0f172a",
+	},
+	input: {
+		flex: 1,
+		backgroundColor: "#f5f5f5",
+		borderRadius: 20,
+		paddingHorizontal: 16,
+		paddingVertical: 10,
+		marginRight: 8,
+		fontSize: 16,
+		maxHeight: 100,
+	},
+	emptyContent: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
 	},
 });
