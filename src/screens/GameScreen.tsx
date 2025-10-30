@@ -1,18 +1,13 @@
-import React, {
-	useState,
-	useEffect,
-	useRef,
-	useCallback,
-	useMemo,
-} from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
 	View,
 	Text,
 	StyleSheet,
-	ScrollView,
+	FlatList,
 	TextInput,
 	TouchableOpacity,
 	ActivityIndicator,
+	Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
@@ -23,9 +18,14 @@ import {
 	NavigationRoutes,
 	GameWithPlayers,
 	MessageWithPlayer,
+	PlatformType,
 } from "../types";
 import { gameLogger } from "../utils/logger";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { EmptyMessageList, GameMessage } from "../components/game";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { LegendList } from "@legendapp/list";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = AppStackScreenProps<NavigationRoutes.Game>;
 
@@ -36,8 +36,9 @@ export default function GameScreen({ navigation, route }: Props) {
 	const [message, setMessage] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [sending, setSending] = useState(false);
-	const scrollViewRef = useRef<ScrollView>(null);
+	const flatListRef = useRef<FlatList<MessageWithPlayer>>(null);
 	const currentPlayerId = useRef<number | null>(null);
+	const insets = useSafeAreaInsets();
 
 	useEffect(() => {
 		loadGame();
@@ -65,7 +66,11 @@ export default function GameScreen({ navigation, route }: Props) {
 	}, [game]);
 
 	useEffect(() => {
-		scrollViewRef.current?.scrollToEnd({ animated: true });
+		if (messages.length > 0) {
+			setTimeout(() => {
+				flatListRef.current?.scrollToEnd({ animated: true });
+			}, 100);
+		}
 	}, [messages]);
 
 	const loadGame = async () => {
@@ -95,9 +100,6 @@ export default function GameScreen({ navigation, route }: Props) {
 			gameLogger.error("Failed to load messages:", error);
 		}
 	};
-
-	const getPlayerName = (message: MessageWithPlayer): string =>
-		message.player.profile?.user_name || "Bot";
 
 	const enableSendMessage = useMemo(() => {
 		return !sending && !!message.trim();
@@ -140,74 +142,71 @@ export default function GameScreen({ navigation, route }: Props) {
 
 	return (
 		<LinearGradient colors={["#0f172a", "#1e293b"]} style={styles.container}>
-			<View style={styles.header}>
-				<View>
-					<Text style={styles.roomTitle}>Topic: {game.topic}</Text>
-					<Text style={styles.playerCount}>
-						Players: {playerCount}
-					</Text>
-          <Text style={styles.playerCount}>
-						Humans: {humanCount}
-					</Text>
-          <Text style={styles.playerCount}>
-						Bots: {botCount}
-					</Text>
+			<View style={{ paddingTop: insets.top }}>
+				<View style={styles.header}>
+					<View style={styles.topicPill}>
+						<Text style={styles.topicLabel}>Topic</Text>
+						<Text style={styles.topicText}>{game.topic}</Text>
+					</View>
+					<View style={styles.chipsRow}>
+						<View style={styles.chip}>
+							<Text style={styles.chipText}>Players: {playerCount}</Text>
+						</View>
+						<View style={styles.chip}>
+							<Text style={styles.chipText}>Humans: {humanCount}</Text>
+						</View>
+						<View style={styles.chip}>
+							<Text style={styles.chipText}>Bots: {botCount}</Text>
+						</View>
+					</View>
 				</View>
 			</View>
 
-			<ScrollView
-				ref={scrollViewRef}
-				style={styles.messagesContainer}
-				contentContainerStyle={styles.messagesContent}
+			<KeyboardAvoidingView
+				style={styles.keyboardAvoidingView}
+				behavior={Platform.OS === PlatformType.IOS ? "padding" : "height"}
 			>
-				{messages.length === 0 ? (
-					<View style={styles.emptyContainer}>
-						<Text style={styles.emptyText}>
-							Be the first to send a message!
-						</Text>
-					</View>
-				) : (
-					messages.map((msg) => {
-						const isOwnMessage = msg.player_id === currentPlayerId.current;
-
-						return (
-							<View
-								key={msg.id}
-								style={[styles.message, isOwnMessage && styles.ownMessage]}
-							>
-								<Text style={[styles.playerName, msg.is_bot && styles.botName]}>
-									{getPlayerName(msg)}
-								</Text>
-								<Text style={styles.messageText}>{msg.content}</Text>
-							</View>
-						);
-					})
-				)}
-			</ScrollView>
-
-			<View style={styles.inputContainer}>
-				<TextInput
-					style={styles.textInput}
-					value={message}
-					onChangeText={setMessage}
-					placeholder="Type your message..."
-					placeholderTextColor="#64748b"
-					multiline
-					maxLength={500}
-					editable={!sending}
-				/>
-				<TouchableOpacity
-					style={[styles.sendButton, sending && styles.sendButtonDisabled]}
-					onPress={handleSendMessage}
-					disabled={!enableSendMessage}
-				>
-					{sending ? (
-						<ActivityIndicator size="small" color="#fff" />
-					) : (
-						<Ionicons name="send" size={20} color="#fff" />
+				<LegendList
+					contentContainerStyle={styles.legendListContent}
+					data={messages}
+					renderItem={({ item }) => (
+						<GameMessage
+							message={item}
+							isOwnMessage={item.player_id === currentPlayerId.current}
+							gamePlayer={item.player}
+						/>
 					)}
-				</TouchableOpacity>
-			</View>
+					ListEmptyComponent={<EmptyMessageList />}
+					keyExtractor={(item) => item.id.toString()}
+					alignItemsAtEnd
+					maintainScrollAtEnd
+					maintainVisibleContentPosition
+					estimatedItemSize={100}
+				/>
+				<View style={styles.inputContainer}>
+					<TextInput
+						style={styles.textInput}
+						value={message}
+						onChangeText={setMessage}
+						placeholder="Type your message..."
+						placeholderTextColor="#64748b"
+						multiline
+						maxLength={500}
+						editable={!sending}
+					/>
+					<TouchableOpacity
+						style={[styles.sendButton, sending && styles.sendButtonDisabled]}
+						onPress={handleSendMessage}
+						disabled={!enableSendMessage}
+					>
+						{sending ? (
+							<ActivityIndicator size="small" color="#fff" />
+						) : (
+							<Ionicons name="send" size={20} color="#fff" />
+						)}
+					</TouchableOpacity>
+				</View>
+			</KeyboardAvoidingView>
 		</LinearGradient>
 	);
 }
@@ -227,71 +226,66 @@ const styles = StyleSheet.create({
 		color: "#94a3b8",
 	},
 	header: {
-		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
 		padding: 16,
 		borderBottomWidth: 1,
 		borderBottomColor: "#334155",
+		gap: 12,
 	},
-	roomTitle: {
+	topicPill: {
+		backgroundColor: "#0b1220",
+		borderColor: "#334155",
+		borderWidth: 1,
+		borderRadius: 12,
+		paddingVertical: 10,
+		paddingHorizontal: 12,
+	},
+	topicLabel: {
+		fontSize: 12,
+		color: "#94a3b8",
+		marginBottom: 4,
+	},
+	topicText: {
 		fontSize: 18,
 		fontWeight: "bold",
 		color: "#f8fafc",
-		marginBottom: 4,
 	},
-	playerCount: {
+	chipsRow: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		gap: 8,
+	},
+	chip: {
+		borderRadius: 999,
+		backgroundColor: "#0b1220",
+		borderWidth: 1,
+		borderColor: "#334155",
+		paddingVertical: 6,
+		paddingHorizontal: 10,
+	},
+	chipText: {
 		fontSize: 12,
 		color: "#94a3b8",
-		marginTop: 2,
 	},
-	messagesContainer: {
+	keyboardAvoidingView: {
 		flex: 1,
 	},
-	messagesContent: {
+	legendListContent: {
+		flex: 1,
+		gap: 16,
 		padding: 16,
-	},
-	emptyContainer: {
-		flex: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		paddingVertical: 40,
-	},
-	emptyText: {
-		fontSize: 16,
-		color: "#64748b",
-		fontStyle: "italic",
-	},
-	message: {
-		marginBottom: 16,
-		padding: 12,
-		backgroundColor: "#1e293b",
-		borderRadius: 12,
-	},
-	ownMessage: {
-		backgroundColor: "#334155",
-		marginLeft: 40,
-	},
-	playerName: {
-		fontSize: 14,
-		fontWeight: "600",
-		color: "#6366f1",
-		marginBottom: 4,
-	},
-	botName: {
-		color: "#f59e0b",
-	},
-	messageText: {
-		fontSize: 16,
-		color: "#f8fafc",
-		lineHeight: 22,
+		paddingBottom: 0,
 	},
 	inputContainer: {
+		position: "static",
+		bottom: 0,
+		left: 0,
+		right: 0,
 		flexDirection: "row",
 		padding: 16,
 		borderTopWidth: 1,
 		borderTopColor: "#334155",
 		alignItems: "flex-end",
+		backgroundColor: "#0f172a",
 	},
 	textInput: {
 		flex: 1,

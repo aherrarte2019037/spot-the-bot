@@ -31,26 +31,28 @@ export default function GameMessage({
 
 const styles = StyleSheet.create({
 	message: {
-		marginBottom: 16,
-		padding: 12,
-		backgroundColor: "#1e293b",
+    maxWidth: "80%",
+		paddingVertical: 10,
+		paddingHorizontal: 18,
+		backgroundColor: "#525252",
 		borderRadius: 12,
+    alignSelf: "flex-start",
 	},
 	ownMessage: {
 		backgroundColor: "#334155",
-		marginLeft: 40,
+		alignSelf: "flex-end",
 	},
 	playerName: {
-		fontSize: 14,
+		fontSize: 12,
 		fontWeight: "600",
 		color: "#6366f1",
-		marginBottom: 4,
+		marginBottom: 2,
 	},
 	botName: {
 		color: "#f59e0b",
 	},
 	messageText: {
-		fontSize: 16,
+		fontSize: 18,
 		color: "#f8fafc",
 		lineHeight: 22,
 	},

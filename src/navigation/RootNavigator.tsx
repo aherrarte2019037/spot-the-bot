@@ -69,6 +69,7 @@ export default function RootNavigator() {
 					<RootStack.Screen
 						name={NavigationRoutes.Game}
 						component={GameScreen}
+            options={{ headerShown: false }}
 					/>
 					<RootStack.Screen
 						name={NavigationRoutes.Results}
