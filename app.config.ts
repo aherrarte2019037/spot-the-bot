@@ -21,7 +21,7 @@ export default ({ config }: ConfigContext): CustomExpoConfig => ({
     usesAppleSignIn: true
   },
   android: {
-    softwareKeyboardLayoutMode: 'pan',
+    softwareKeyboardLayoutMode: 'resize',
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#ffffff'

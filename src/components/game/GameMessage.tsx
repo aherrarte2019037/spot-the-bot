@@ -19,8 +19,8 @@ export default function GameMessage({
 		return gamePlayer.profile.user_name;
 	}, [message.is_bot, gamePlayer.profile]);
 
-	return (
-		<View style={[styles.message, isOwnMessage && styles.ownMessage]}>
+    return (
+        <View style={isOwnMessage ? styles.ownMessage : styles.otherMessage}>
 			<Text style={[styles.playerName, message.is_bot && styles.botName]}>
 				{playerName}
 			</Text>
@@ -30,23 +30,34 @@ export default function GameMessage({
 }
 
 const styles = StyleSheet.create({
-	message: {
-    maxWidth: "80%",
-		paddingVertical: 10,
-		paddingHorizontal: 18,
-		backgroundColor: "#525252",
-		borderRadius: 12,
-    alignSelf: "flex-start",
-	},
-	ownMessage: {
-		backgroundColor: "#334155",
-		alignSelf: "flex-end",
-	},
+    ownMessage: {
+        maxWidth: "80%",
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        backgroundColor: "#334155",
+        alignSelf: "flex-end",
+        borderTopLeftRadius: 14,
+        borderTopRightRadius: 14,
+        borderBottomLeftRadius: 14,
+        borderBottomRightRadius: 0,
+    },
+    otherMessage: {
+        maxWidth: "80%",
+        paddingVertical: 10,
+        paddingHorizontal: 12,
+        backgroundColor: "#525252",
+        alignSelf: "flex-start",
+        borderTopLeftRadius: 14,
+        borderTopRightRadius: 14,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 14,
+    },
 	playerName: {
 		fontSize: 12,
+    lineHeight: 12,
 		fontWeight: "600",
 		color: "#6366f1",
-		marginBottom: 2,
+		marginBottom: 6,
 	},
 	botName: {
 		color: "#f59e0b",
@@ -54,6 +65,6 @@ const styles = StyleSheet.create({
 	messageText: {
 		fontSize: 18,
 		color: "#f8fafc",
-		lineHeight: 22,
+		lineHeight: 18,
 	},
 });
