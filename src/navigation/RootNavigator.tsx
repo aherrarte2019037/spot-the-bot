@@ -10,6 +10,7 @@ import OnboardingScreen from "../screens/OnboardingScreen";
 import ResultsScreen from "../screens/ResultsScreen";
 import SignInScreen from "../screens/SignInScreen";
 import SignUpScreen from "../screens/SignUpScreen";
+import VotingScreen from "../screens/VotingScreen";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -70,6 +71,11 @@ export default function RootNavigator() {
 						name={NavigationRoutes.Game}
 						component={GameScreen}
             options={{ headerShown: false }}
+					/>
+					<RootStack.Screen
+						name={NavigationRoutes.Voting}
+						component={VotingScreen}
+						options={{ headerShown: false }}
 					/>
 					<RootStack.Screen
 						name={NavigationRoutes.Results}

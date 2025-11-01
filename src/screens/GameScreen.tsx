@@ -1,10 +1,9 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import {
 	View,
 	Text,
 	TextInput,
 	TouchableOpacity,
-	FlatList,
 	StyleSheet,
 	ActivityIndicator,
 	Platform,
@@ -26,6 +25,7 @@ import { gameLogger } from "../utils";
 import { EmptyMessageList, GameMessage } from "../components/game";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { LegendList, LegendListRef } from "@legendapp/list";
+import { parseISO, differenceInSeconds } from "date-fns";
 
 type Props = AppStackScreenProps<NavigationRoutes.Game>;
 
@@ -40,12 +40,85 @@ export default function GameScreen({ navigation, route }: Props) {
 	const [message, setMessage] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [sending, setSending] = useState(false);
+	const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
 
-	React.useEffect(() => {
+	useEffect(() => {
 		loadGame();
 	}, []);
 
-	React.useEffect(() => {
+	// Auto-start game if status is waiting
+	useEffect(() => {
+		if (!game || game.status !== "waiting") return;
+
+		const startGame = async () => {
+			try {
+				await gameService.startGame(game.id);
+				// Reload game to get updated started_at
+				const updatedGame = await gameService.get(game.id);
+				setGame(updatedGame);
+			} catch (error) {
+				gameLogger.error("Failed to start game:", error);
+			}
+		};
+
+		startGame();
+	}, [game]);
+
+	// Subscribe to game updates for status changes
+	useEffect(() => {
+		if (!game) return;
+
+		const channel = gameService.subscribeToGame(game.id, (updatedGame) => {
+			setGame((prev) => {
+				if (!prev) return prev;
+				return { ...prev, ...updatedGame };
+			});
+
+			// Handle status transitions
+			if (updatedGame.status === "voting") {
+				navigation.replace(NavigationRoutes.Voting, {
+					gameId: game.id.toString(),
+				});
+			}
+		});
+
+		return () => {
+			channel.unsubscribe();
+		};
+	}, [game]);
+
+	// Timer logic
+	useEffect(() => {
+		if (!game || !game.started_at || game.chat_duration === null) {
+			setTimeRemaining(null);
+			return;
+		}
+
+		const calculateRemaining = () => {
+			const startTime = parseISO(game.started_at!);
+			const duration = game.chat_duration!; // Duration in seconds
+			const elapsed = differenceInSeconds(new Date(), startTime);
+			const remaining = Math.max(0, duration - elapsed);
+			return remaining;
+		};
+
+		setTimeRemaining(calculateRemaining());
+
+		const interval = setInterval(() => {
+			const remaining = calculateRemaining();
+			setTimeRemaining(remaining);
+
+			if (remaining <= 0) {
+				clearInterval(interval);
+				endChatPhase();
+			}
+		}, 1000);
+
+		return () => clearInterval(interval);
+	}, [game?.started_at, game?.chat_duration, game?.id]);
+
+	// Subscribe to messages
+	useEffect(() => {
 		if (!game) return;
 
 		loadMessages();
@@ -91,6 +164,23 @@ export default function GameScreen({ navigation, route }: Props) {
 		} catch (error) {
 			gameLogger.error("Failed to load messages:", error);
 		}
+	};
+
+	const endChatPhase = async () => {
+		if (!game) return;
+
+		try {
+			await gameService.endChatPhase(game.id);
+			// The subscription will handle navigation when status changes
+		} catch (error) {
+			gameLogger.error("Failed to end chat phase:", error);
+		}
+	};
+
+	const formatTime = (seconds: number): string => {
+		const mins = Math.floor(seconds / 60);
+		const secs = seconds % 60;
+		return `${mins}:${secs.toString().padStart(2, "0")}`;
 	};
 
 	const scrollToBottom = () => {
@@ -154,6 +244,14 @@ export default function GameScreen({ navigation, route }: Props) {
 					<Text style={styles.topicText}>{game.topic}</Text>
 				</View>
 				<View style={styles.chipsRow}>
+					{timeRemaining !== null && (
+						<View style={[styles.chip, styles.timerChip]}>
+							<Ionicons name="time-outline" size={14} color="#f59e0b" />
+							<Text style={[styles.chipText, styles.timerText]}>
+								{formatTime(timeRemaining)}
+							</Text>
+						</View>
+					)}
 					<View style={styles.chip}>
 						<Text style={styles.chipText}>Players: {playerCount}</Text>
 					</View>
@@ -292,6 +390,17 @@ const styles = StyleSheet.create({
 	chipText: {
 		fontSize: 12,
 		color: "#94a3b8",
+	},
+	timerChip: {
+		borderColor: "#f59e0b",
+		backgroundColor: "#1e1a0f",
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 4,
+	},
+	timerText: {
+		color: "#f59e0b",
+		fontWeight: "600",
 	},
 	header: {
 		padding: 16,

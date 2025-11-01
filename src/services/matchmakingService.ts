@@ -4,6 +4,7 @@ import { topicService } from './topicService';
 import { GameWithPlayers, BotPersonality, TablesInsert } from '../types';
 import { authLogger } from '../utils/logger';
 import { generateBotNames } from '../utils/botNames';
+import { formatISO, subSeconds } from 'date-fns';
 
 export const matchmakingService = {
   async startMatchmaking(profileId: string): Promise<GameWithPlayers> {
@@ -31,7 +32,7 @@ export const matchmakingService = {
 
   async findWaitingGame(): Promise<GameWithPlayers | null> {
     try {
-      const thirtySecondsAgo = new Date(Date.now() - 30000).toISOString();
+      const thirtySecondsAgo = formatISO(subSeconds(new Date(), 30));
 
       const { data, error } = await supabase
         .from('games')

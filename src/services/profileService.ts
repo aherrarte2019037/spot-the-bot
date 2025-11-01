@@ -1,6 +1,7 @@
 import { supabase } from '../core/supabase';
 import { Profile, TablesInsert, TablesUpdate } from '../types';
 import { authLogger } from '../utils/logger';
+import { formatISO } from 'date-fns';
 
 export const profileService = {
   async get(profileId: string): Promise<Profile | null> {
@@ -29,7 +30,7 @@ export const profileService = {
         .from('profiles')
         .update({
           ...updates,
-          updated_at: new Date().toISOString(),
+          updated_at: formatISO(new Date()),
         })
         .eq('id', profileId);
 

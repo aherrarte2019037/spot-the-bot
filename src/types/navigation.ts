@@ -7,6 +7,7 @@ export enum NavigationRoutes {
   Home = 'Home',
   Matchmaking = 'Matchmaking',
   Game = 'Game',
+  Voting = 'Voting',
   Results = 'Results',
 }
 
@@ -23,6 +24,7 @@ export type AppStackParamList = {
   [NavigationRoutes.Home]: undefined;
   [NavigationRoutes.Matchmaking]: undefined;
   [NavigationRoutes.Game]: { gameId: string };
+  [NavigationRoutes.Voting]: { gameId: string };
   [NavigationRoutes.Results]: { gameId: string; score: number };
 };
 

@@ -2,6 +2,7 @@ import { supabase } from '../core/supabase';
 import { gameLogger } from '../utils/logger';
 import { GameWithPlayers, TablesInsert, GamePlayer, Message, Game, MessageWithPlayer } from '../types';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { formatISO } from 'date-fns';
 
 export const gameService = {
   async create(gameData: TablesInsert<'games'>): Promise<GameWithPlayers> {
@@ -73,6 +74,35 @@ export const gameService = {
         (payload) => callback(payload.new as Game)
       )
       .subscribe();
+  },
+
+  async startGame(gameId: number): Promise<void> {
+    const { error } = await supabase
+      .from('games')
+      .update({
+        status: 'chatting',
+        started_at: formatISO(new Date()),
+      })
+      .eq('id', gameId);
+
+    if (error) {
+      gameLogger.error('Failed to start game:', error);
+      throw error;
+    }
+  },
+
+  async endChatPhase(gameId: number): Promise<void> {
+    const { error } = await supabase
+      .from('games')
+      .update({
+        status: 'voting',
+      })
+      .eq('id', gameId);
+
+    if (error) {
+      gameLogger.error('Failed to end chat phase:', error);
+      throw error;
+    }
   },
 
   async subscribeToMessages(gameId: number, callback: (message: MessageWithPlayer) => void): Promise<RealtimeChannel> {
