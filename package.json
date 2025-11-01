@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "generate-types": "./scripts/generate-database-types.sh",
+    "deploy-functions": "./scripts/deploy-functions.sh"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
