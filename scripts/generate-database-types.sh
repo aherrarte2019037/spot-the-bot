@@ -10,7 +10,10 @@ TARGET_FILE="${TARGET_DIR}/database.types.ts"
 mkdir -p "$(dirname "${SOURCE_FILE}")"
 mkdir -p "${TARGET_DIR}"
 
-npx supabase gen types typescript > "${SOURCE_FILE}"
+PROJECT_ID="zbpowpvpzsugrdqwurub"
+
+npx supabase gen types typescript --project-id "$PROJECT_ID" --schema public > "${SOURCE_FILE}" 2>&1
+
 cat "${SOURCE_FILE}" > "${TARGET_FILE}"
 
 echo "✅ Types generated and synced"

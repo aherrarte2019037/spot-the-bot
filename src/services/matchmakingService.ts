@@ -1,9 +1,8 @@
 import { supabase } from '../core/supabase';
 import { gameService } from './gameService';
 import { topicService } from './topicService';
-import { GameWithPlayers, BotPersonality, TablesInsert } from '../types';
+import { GameWithPlayers, TablesInsert } from '../types';
 import { authLogger } from '../utils/logger';
-import { generateBotNames } from '../utils/botNames';
 import { formatISO, subSeconds } from 'date-fns';
 
 export const matchmakingService = {
@@ -80,7 +79,6 @@ export const matchmakingService = {
         topic_id: topic.id,
         max_players: 7,
         bot_count: 2,
-        bot_player_ids: [],
         chat_duration: 120,
       };
 
@@ -95,11 +93,7 @@ export const matchmakingService = {
         throw gameError;
       }
 
-      const botNames = await this.addBotsToGame(gameData.id, 2);
-      await supabase
-        .from('games')
-        .update({ bot_player_ids: botNames })
-        .eq('id', gameData.id);
+      await this.addBotsToGame(gameData.id, 2);
 
       await gameService.join(gameData.id, profileId);
       const game = await gameService.get(gameData.id);
@@ -111,29 +105,15 @@ export const matchmakingService = {
     }
   },
 
-  async addBotsToGame(gameId: number, count: number, existingNames: string[] = []): Promise<string[]> {
-    const personalities: BotPersonality[] = ['casual', 'formal', 'quirky'];
-    const botNames = generateBotNames(count, existingNames);
+  async addBotsToGame(gameId: number, count: number): Promise<void> {
+    const { data: response, error } = await supabase.functions.invoke('add-bots', {
+      body: { game_id: gameId, count },
+    });
 
-    for (let i = 0; i < count; i++) {
-      const botInsert: TablesInsert<'game_players'> = {
-        game_id: gameId,
-        profile_id: null,
-        is_bot: true,
-        bot_personality: personalities[i % personalities.length],
-        score: 0,
-      };
-
-      const { error } = await supabase
-        .from('game_players')
-        .insert(botInsert);
-
-      if (error) {
-        authLogger.error('Error adding bot to game:', error);
-      }
+    if (error || !response.success) {
+      authLogger.error('Failed to add bots:', error);
+      throw new Error(error.message);
     }
-
-    return botNames;
   },
 
   subscribeToGameUpdates(gameId: number, callback: (game: GameWithPlayers) => void) {

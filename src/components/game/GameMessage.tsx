@@ -1,6 +1,7 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { GamePlayerWithProfile, MessageWithPlayer } from "../../types";
+import { getPlayerName } from "../../utils";
 
 interface GameMessageProps {
 	message: MessageWithPlayer;
@@ -13,14 +14,10 @@ export default function GameMessage({
 	isOwnMessage,
 	gamePlayer,
 }: GameMessageProps) {
-	const playerName = useMemo(() => {
-		if (message.is_bot || !gamePlayer.profile) return "Bot";
+	const playerName = getPlayerName(gamePlayer);
 
-		return gamePlayer.profile.user_name;
-	}, [message.is_bot, gamePlayer.profile]);
-
-    return (
-        <View style={isOwnMessage ? styles.ownMessage : styles.otherMessage}>
+	return (
+		<View style={isOwnMessage ? styles.ownMessage : styles.otherMessage}>
 			<Text style={[styles.playerName, message.is_bot && styles.botName]}>
 				{playerName}
 			</Text>
@@ -30,31 +27,31 @@ export default function GameMessage({
 }
 
 const styles = StyleSheet.create({
-    ownMessage: {
-        maxWidth: "80%",
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        backgroundColor: "#334155",
-        alignSelf: "flex-end",
-        borderTopLeftRadius: 14,
-        borderTopRightRadius: 14,
-        borderBottomLeftRadius: 14,
-        borderBottomRightRadius: 0,
-    },
-    otherMessage: {
-        maxWidth: "80%",
-        paddingVertical: 10,
-        paddingHorizontal: 12,
-        backgroundColor: "#525252",
-        alignSelf: "flex-start",
-        borderTopLeftRadius: 14,
-        borderTopRightRadius: 14,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 14,
-    },
+	ownMessage: {
+		maxWidth: "80%",
+		paddingVertical: 10,
+		paddingHorizontal: 12,
+		backgroundColor: "#334155",
+		alignSelf: "flex-end",
+		borderTopLeftRadius: 14,
+		borderTopRightRadius: 14,
+		borderBottomLeftRadius: 14,
+		borderBottomRightRadius: 0,
+	},
+	otherMessage: {
+		maxWidth: "80%",
+		paddingVertical: 10,
+		paddingHorizontal: 12,
+		backgroundColor: "#525252",
+		alignSelf: "flex-start",
+		borderTopLeftRadius: 14,
+		borderTopRightRadius: 14,
+		borderBottomLeftRadius: 0,
+		borderBottomRightRadius: 14,
+	},
 	playerName: {
 		fontSize: 12,
-    lineHeight: 12,
+		lineHeight: 12,
 		fontWeight: "600",
 		color: "#6366f1",
 		marginBottom: 6,

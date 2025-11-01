@@ -17,6 +17,7 @@ export type Database = {
       game_players: {
         Row: {
           bot_personality: Database["public"]["Enums"]["bot_personality"]
+          bot_username: string
           created_at: string
           game_id: number | null
           id: number
@@ -26,6 +27,7 @@ export type Database = {
         }
         Insert: {
           bot_personality?: Database["public"]["Enums"]["bot_personality"]
+          bot_username?: string
           created_at?: string
           game_id?: number | null
           id?: number
@@ -35,6 +37,7 @@ export type Database = {
         }
         Update: {
           bot_personality?: Database["public"]["Enums"]["bot_personality"]
+          bot_username?: string
           created_at?: string
           game_id?: number | null
           id?: number
@@ -62,7 +65,6 @@ export type Database = {
       games: {
         Row: {
           bot_count: number
-          bot_player_ids: string[] | null
           chat_duration: number | null
           created_at: string
           ended_at: string | null
@@ -76,7 +78,6 @@ export type Database = {
         }
         Insert: {
           bot_count?: number
-          bot_player_ids?: string[] | null
           chat_duration?: number | null
           created_at?: string
           ended_at?: string | null
@@ -90,7 +91,6 @@ export type Database = {
         }
         Update: {
           bot_count?: number
-          bot_player_ids?: string[] | null
           chat_duration?: number | null
           created_at?: string
           ended_at?: string | null

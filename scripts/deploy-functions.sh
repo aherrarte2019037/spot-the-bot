@@ -2,19 +2,11 @@
 
 set -e
 
-FUNCTIONS=(
-  "submit-votes"
-  "start-game"
-  "end-chat-phase"
-  "calculate-results"
-)
+PROJECT_ID="${SUPABASE_PROJECT_ID:-zbpowpvpzsugrdqwurub}"
 
-echo "🚀 Deploying ${#FUNCTIONS[@]} functions..."
+echo "🚀 Deploying all functions..."
 
-for func in "${FUNCTIONS[@]}"; do
-  echo "  Deploying ${func}..."
-  npx supabase functions deploy "${func}"
-done
+npx supabase functions deploy --project-ref "${PROJECT_ID}"
 
 echo "✅ All functions deployed"
 

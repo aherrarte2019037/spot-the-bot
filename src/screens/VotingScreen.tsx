@@ -19,7 +19,7 @@ import {
 	Vote,
 } from "../types";
 import { gameService, voteService } from "../services";
-import { gameLogger } from "../utils";
+import { gameLogger, getPlayerName } from "../utils";
 import { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "../core/supabase";
 
@@ -167,12 +167,6 @@ export default function VotingScreen({ navigation, route }: Props) {
 		};
 	}, [game, votes]);
 
-	const getPlayerName = (player: GamePlayerWithProfile): string => {
-		if (player.is_bot && player.bot_personality) {
-			return player.bot_personality.charAt(0).toUpperCase() + player.bot_personality.slice(1);
-		}
-		return player.profile?.user_name || "Unknown";
-	};
 
 	const togglePlayerSelection = (playerId: number) => {
 		if (hasVoted) return; // Can't change votes after submitting

@@ -1,2 +1,2 @@
 export * from './logger';
-export * from './botNames';
+export * from './playerName';
