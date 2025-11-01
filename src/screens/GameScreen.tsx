@@ -53,9 +53,8 @@ export default function GameScreen({ navigation, route }: Props) {
 		const startGame = async () => {
 			try {
 				await gameService.startGame(game.id);
-				// Reload game to get updated started_at
-				const updatedGame = await gameService.get(game.id);
-				setGame(updatedGame);
+				const fullGame = await gameService.get(game.id);
+				setGame(fullGame);
 			} catch (error) {
 				gameLogger.error("Failed to start game:", error);
 			}

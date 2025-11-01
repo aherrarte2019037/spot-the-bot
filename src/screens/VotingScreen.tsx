@@ -197,18 +197,12 @@ export default function VotingScreen({ navigation, route }: Props) {
 		try {
 			setSubmitting(true);
 
-			// Submit all votes
-			await Promise.all(
-				selectedPlayers.map((targetId) =>
-					voteService.submit({
-						game_id: game.id,
-						voter_id: currentPlayerId.current,
-						target_id: targetId,
-					})
-				)
-			);
+			await voteService.submitVotes({
+				game_id: game.id,
+				voter_id: currentPlayerId.current,
+				target_ids: selectedPlayers,
+			});
 
-			// Reload votes to get updated list
 			await loadVotes();
 
 			gameLogger.info("Votes submitted successfully");

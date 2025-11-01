@@ -2,7 +2,6 @@ import { supabase } from '../core/supabase';
 import { gameLogger } from '../utils/logger';
 import { GameWithPlayers, TablesInsert, GamePlayer, Message, Game, MessageWithPlayer } from '../types';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import { formatISO } from 'date-fns';
 
 export const gameService = {
   async create(gameData: TablesInsert<'games'>): Promise<GameWithPlayers> {
@@ -76,33 +75,34 @@ export const gameService = {
       .subscribe();
   },
 
-  async startGame(gameId: number): Promise<void> {
-    const { error } = await supabase
-      .from('games')
-      .update({
-        status: 'chatting',
-        started_at: formatISO(new Date()),
-      })
-      .eq('id', gameId);
+  async startGame(gameId: number): Promise<Game> {
+    const { data: response, error } = await supabase.functions.invoke('start-game', {
+      body: { game_id: gameId },
+    });
 
-    if (error) {
+    if (error || !response.success) {
       gameLogger.error('Failed to start game:', error);
-      throw error;
+      throw new Error(error.message);
     }
+
+    return response.data.game;
   },
 
-  async endChatPhase(gameId: number): Promise<void> {
-    const { error } = await supabase
-      .from('games')
-      .update({
-        status: 'voting',
-      })
-      .eq('id', gameId);
+  async endChatPhase(gameId: number): Promise<Game> {
+    const { data, error } = await supabase.functions.invoke('end-chat-phase', {
+      body: { game_id: gameId },
+    });
 
     if (error) {
       gameLogger.error('Failed to end chat phase:', error);
       throw error;
     }
+
+    if (!data?.success || !data?.data?.game) {
+      throw new Error(data?.message || 'Invalid response from end-chat-phase function');
+    }
+
+    return data.data.game;
   },
 
   async subscribeToMessages(gameId: number, callback: (message: MessageWithPlayer) => void): Promise<RealtimeChannel> {
