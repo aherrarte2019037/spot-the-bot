@@ -177,14 +177,14 @@ serve(async (req) => {
               .eq("id", scoreData.player_id);
           }
 
-          // Update profiles with XP (calculate XP based on score)
+          // Update profiles with XP, games_played, and games_won
           for (const scoreData of scores) {
             const player = humanPlayers.find((p) => p.id === scoreData.player_id);
             if (player?.profile_id) {
-              // Get current XP
+              // Get current profile stats
               const { data: profile } = await supabase
                 .from("profiles")
-                .select("xp")
+                .select("xp, games_played, games_won")
                 .eq("id", player.profile_id)
                 .single();
 
@@ -193,8 +193,18 @@ serve(async (req) => {
                 const xpGained = Math.max(10, Math.floor(scoreData.score / 10));
                 const newXp = profile.xp + xpGained;
 
-                // Update profile XP and let trigger calculate level
-                const profileUpdate: TablesUpdate<"profiles"> = { xp: newXp };
+                // Increment games_played
+                const newGamesPlayed = profile.games_played + 1;
+
+                // Increment games_won if player correctly identified at least one bot
+                const newGamesWon = profile.games_won + (scoreData.correct_votes > 0 ? 1 : 0);
+
+                // Update profile stats
+                const profileUpdate: TablesUpdate<"profiles"> = {
+                  xp: newXp,
+                  games_played: newGamesPlayed,
+                  games_won: newGamesWon,
+                };
                 await supabase
                   .from("profiles")
                   .update(profileUpdate)

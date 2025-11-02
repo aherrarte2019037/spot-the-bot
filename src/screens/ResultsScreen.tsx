@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthContext } from '../contexts';
-import { AppStackScreenProps, NavigationRoutes, GameWithPlayers, Vote } from '../types';
+import { AppStackScreenProps, NavigationRoutes } from '../types';
 import { gameService, voteService } from '../services';
 import { gameLogger, getPlayerName } from '../utils';
 
@@ -20,7 +20,7 @@ interface ResultsData {
 }
 
 export default function ResultsScreen({ navigation, route }: Props) {
-  const { profile } = useAuthContext();
+  const { profile, refreshProfile } = useAuthContext();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState<ResultsData | null>(null);
@@ -28,6 +28,7 @@ export default function ResultsScreen({ navigation, route }: Props) {
 
   useEffect(() => {
     loadResults();
+    refreshProfile();
   }, []);
 
   const loadResults = async () => {

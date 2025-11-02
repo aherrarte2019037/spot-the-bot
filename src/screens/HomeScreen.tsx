@@ -69,6 +69,10 @@ export default function HomeScreen({ navigation }: Props) {
 							<Text style={styles.statValue}>{profile.level}</Text>
 							<Text style={styles.statLabel}>Level</Text>
 						</View>
+						<View style={styles.statBox}>
+							<Text style={styles.statValue}>{profile.xp}</Text>
+							<Text style={styles.statLabel}>XP</Text>
+						</View>
 					</View>
 				</View>
 			</ScrollView>
@@ -177,5 +181,6 @@ const styles = StyleSheet.create({
 		color: "#94a3b8",
 		fontSize: 12,
 		marginTop: 4,
+    textAlign: "center",
 	},
 });
