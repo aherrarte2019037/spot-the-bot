@@ -21,9 +21,9 @@ export type Database = {
           created_at: string
           game_id: number | null
           id: number
-          is_bot: boolean | null
+          is_bot: boolean
           profile_id: string | null
-          score: number | null
+          score: number
         }
         Insert: {
           bot_personality?: Database["public"]["Enums"]["bot_personality"]
@@ -31,9 +31,9 @@ export type Database = {
           created_at?: string
           game_id?: number | null
           id?: number
-          is_bot?: boolean | null
+          is_bot?: boolean
           profile_id?: string | null
-          score?: number | null
+          score?: number
         }
         Update: {
           bot_personality?: Database["public"]["Enums"]["bot_personality"]
@@ -41,9 +41,9 @@ export type Database = {
           created_at?: string
           game_id?: number | null
           id?: number
-          is_bot?: boolean | null
+          is_bot?: boolean
           profile_id?: string | null
-          score?: number | null
+          score?: number
         }
         Relationships: [
           {
