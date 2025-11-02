@@ -1,34 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import type { Database, TablesUpdate } from "../_shared/database.types.ts";
+import type { TablesUpdate } from "../_shared/database.types.ts";
+import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Content-Type": "application/json",
-};
+interface EndChatPhaseRequest {
+  game_id: number;
+}
 
 serve(async (req) => {
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Missing authorization header" }),
-        { status: 401, headers: corsHeaders }
-      );
-    }
+    const authError = requireAuth(req);
+    if (authError) return authError;
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+    const supabase = createSupabaseClient();
 
-    const { game_id }: { game_id: number } = await req.json();
+    const { game_id }: EndChatPhaseRequest = await req.json();
 
     if (!game_id) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Missing game_id" }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse("Missing game_id", 400);
     }
 
     // 1. Validate game exists and is in chatting status
@@ -39,18 +27,12 @@ serve(async (req) => {
       .single();
 
     if (gameError || !game) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Game not found" }),
-        { status: 404, headers: corsHeaders }
-      );
+      return createErrorResponse("Game not found", 404);
     }
 
     const currentStatus = game.status;
     if (currentStatus !== "chatting") {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: `Game is not in chatting status (current: ${currentStatus})` }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse(`Game is not in chatting status (current: ${currentStatus})`, 400);
     }
 
     // 2. Update game to voting status with ended_at timestamp
@@ -68,21 +50,12 @@ serve(async (req) => {
       .single();
 
     if (updateError) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: `Failed to end chat phase: ${updateError.message}` }),
-        { status: 500, headers: corsHeaders }
-      );
+      return createErrorResponse(`Failed to end chat phase: ${updateError.message}`, 500);
     }
 
-    return new Response(
-      JSON.stringify({ success: true, data: { game: updatedGame }, message: "Chat phase ended successfully" }),
-      { status: 200, headers: corsHeaders }
-    );
+    return createSuccessResponse({ game: updatedGame }, "Chat phase ended successfully");
   } catch {
-    return new Response(
-      JSON.stringify({ success: false, data: null, message: "Failed to end chat phase" }),
-      { status: 500, headers: corsHeaders }
-    );
+    return createErrorResponse("Failed to end chat phase", 500);
   }
 });
 

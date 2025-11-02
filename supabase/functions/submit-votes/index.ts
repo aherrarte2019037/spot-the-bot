@@ -1,34 +1,24 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import type { Database, TablesInsert, TablesUpdate } from "../_shared/database.types.ts";
+import type { TablesInsert, TablesUpdate } from "../_shared/database.types.ts";
+import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Content-Type": "application/json",
-};
+interface SubmitVotesRequest {
+  game_id: number;
+  voter_id: number;
+  target_ids: number[];
+}
 
 serve(async (req) => {
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Missing authorization header" }),
-        { status: 401, headers: corsHeaders }
-      );
-    }
+    const authError = requireAuth(req);
+    if (authError) return authError;
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+    const supabase = createSupabaseClient();
 
-    const { game_id, voter_id, target_ids }: { game_id: number; voter_id: number; target_ids: number[] } = await req.json();
+    const { game_id, voter_id, target_ids }: SubmitVotesRequest = await req.json();
 
     if (!game_id || !voter_id || !target_ids || !Array.isArray(target_ids)) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Missing required fields: game_id, voter_id, target_ids" }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse("Missing required fields: game_id, voter_id, target_ids", 400);
     }
 
     const { data: game, error: gameError } = await supabase
@@ -38,50 +28,32 @@ serve(async (req) => {
       .single();
 
     if (gameError || !game) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Game not found" }),
-        { status: 404, headers: corsHeaders }
-      );
+      return createErrorResponse("Game not found", 404);
     }
 
     if (game.status !== "voting") {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Game is not in voting phase" }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse("Game is not in voting phase", 400);
     }
 
     const players = game.players;
 
     const voter = players.find((p) => p.id === voter_id);
     if (!voter) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Voter is not a player in this game" }),
-        { status: 403, headers: corsHeaders }
-      );
+      return createErrorResponse("Voter is not a player in this game", 403);
     }
 
     if (voter.is_bot) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Bots cannot vote" }),
-        { status: 403, headers: corsHeaders }
-      );
+      return createErrorResponse("Bots cannot vote", 403);
     }
 
     if (target_ids.length !== game.bot_count) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: `Must vote for exactly ${game.bot_count} players` }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse(`Must vote for exactly ${game.bot_count} players`, 400);
     }
 
     const allPlayerIds = players.map((p) => p.id);
     const invalidTargets = target_ids.filter((id) => !allPlayerIds.includes(id));
     if (invalidTargets.length > 0) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Invalid target player IDs" }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse("Invalid target player IDs", 400);
     }
 
     // 5. Check if voter has already voted
@@ -93,10 +65,7 @@ serve(async (req) => {
       .limit(1);
 
     if (existingVotes && existingVotes.length > 0) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "You have already voted" }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse("You have already voted", 400);
     }
 
     // 6. Insert all votes
@@ -112,10 +81,7 @@ serve(async (req) => {
       .select();
 
     if (votesError) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: `Failed to submit votes: ${votesError.message}` }),
-        { status: 500, headers: corsHeaders }
-      );
+      return createErrorResponse(`Failed to submit votes: ${votesError.message}`, 500);
     }
 
     // 7. Check if all human players have voted
@@ -221,22 +187,13 @@ serve(async (req) => {
             .eq("id", game_id);
         }
       } catch (_error) {
-        return new Response(
-          JSON.stringify({ success: false, data: null, message: "Failed to calculate results" }),
-          { status: 500, headers: corsHeaders }
-        );
+        return createErrorResponse("Failed to calculate results", 500);
       }
     }
 
-    return new Response(
-      JSON.stringify({ success: true, data: { votes }, message: "Votes submitted successfully" }),
-      { status: 200, headers: corsHeaders }
-    );
+    return createSuccessResponse({ votes }, "Votes submitted successfully");
   } catch {
-    return new Response(
-      JSON.stringify({ success: false, data: null, message: "Failed to submit votes" }),
-      { status: 500, headers: corsHeaders }
-    );
+    return createErrorResponse("Failed to submit votes", 500);
   }
 });
 

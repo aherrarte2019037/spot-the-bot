@@ -1,12 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import type { Database, TablesInsert } from "../_shared/database.types.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Content-Type": "application/json",
-};
+import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
 
 const ADJECTIVES = [
   'swift', 'clever', 'bold', 'sharp', 'nimble', 'bright', 'quick', 'wise',
@@ -18,6 +12,11 @@ const NOUNS = [
   'vector', 'matrix', 'logic', 'pulse', 'spark', 'echo', 'beam', 'dash'
 ];
 
+interface AddBotsRequest {
+  game_id: number;
+  count: number;
+}
+
 function generateBotName(): string {
   const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
   const noun = NOUNS[Math.floor(Math.random() * NOUNS.length)];
@@ -26,25 +25,15 @@ function generateBotName(): string {
 
 serve(async (req) => {
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Missing authorization header" }),
-        { status: 401, headers: corsHeaders }
-      );
-    }
+    const authError = requireAuth(req);
+    if (authError) return authError;
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+    const supabase = createSupabaseClient();
 
-    const { game_id, count }: { game_id: number; count: number } = await req.json();
+    const { game_id, count }: AddBotsRequest = await req.json();
 
     if (!game_id || !count || count < 1) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Missing required fields: game_id, count" }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse("Missing required fields: game_id, count", 400);
     }
 
     // Validate game exists
@@ -55,10 +44,7 @@ serve(async (req) => {
       .single();
 
     if (gameError || !game) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Game not found" }),
-        { status: 404, headers: corsHeaders }
-      );
+      return createErrorResponse("Game not found", 404);
     }
 
     const personalities: Database["public"]["Enums"]["bot_personality"][] = ['casual', 'formal', 'quirky'];
@@ -83,21 +69,12 @@ serve(async (req) => {
       .select();
 
     if (insertError) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: `Failed to add bots: ${insertError.message}` }),
-        { status: 500, headers: corsHeaders }
-      );
+      return createErrorResponse(`Failed to add bots: ${insertError.message}`, 500);
     }
 
-    return new Response(
-      JSON.stringify({ success: true, data: { bots: insertedBots }, message: `Successfully added ${count} bot(s)` }),
-      { status: 200, headers: corsHeaders }
-    );
+    return createSuccessResponse({ bots: insertedBots }, `Successfully added ${count} bot(s)`);
   } catch {
-    return new Response(
-      JSON.stringify({ success: false, data: null, message: "Failed to add bots" }),
-      { status: 500, headers: corsHeaders }
-    );
+    return createErrorResponse("Failed to add bots", 500);
   }
 });
 

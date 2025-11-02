@@ -1,12 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import type { Database } from "../_shared/database.types.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Content-Type": "application/json",
-};
+import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
 
 interface GetGameResultsRequest {
   game_id: number;
@@ -15,25 +8,15 @@ interface GetGameResultsRequest {
 
 serve(async (req) => {
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Missing authorization header" }),
-        { status: 401, headers: corsHeaders }
-      );
-    }
+    const authError = requireAuth(req);
+    if (authError) return authError;
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient<Database>(supabaseUrl, supabaseKey);
+    const supabase = createSupabaseClient();
 
     const { game_id, profile_id }: GetGameResultsRequest = await req.json();
 
     if (!game_id || !profile_id) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Missing required fields: game_id, profile_id" }),
-        { status: 400, headers: corsHeaders }
-      );
+      return createErrorResponse("Missing required fields: game_id, profile_id", 400);
     }
 
     // Get game with players and votes
@@ -51,10 +34,7 @@ serve(async (req) => {
       .single();
 
     if (gameError || !game) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Game not found" }),
-        { status: 404, headers: corsHeaders }
-      );
+      return createErrorResponse("Game not found", 404);
     }
 
     const players = game.players;
@@ -63,10 +43,7 @@ serve(async (req) => {
     // Find current player
     const currentPlayer = players.find((p) => p.profile_id === profile_id && !p.is_bot);
     if (!currentPlayer) {
-      return new Response(
-        JSON.stringify({ success: false, data: null, message: "Player not found in game" }),
-        { status: 404, headers: corsHeaders }
-      );
+      return createErrorResponse("Player not found in game", 404);
     }
 
     // Identify bot players
@@ -105,26 +82,19 @@ serve(async (req) => {
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        data: {
-          botPlayers: botPlayerNames,
-          currentPlayerCorrectVotes: correctVotes.length,
-          currentPlayerTotalVotes: currentPlayerVotes.length,
-          currentPlayerScore,
-          xpGained,
-          totalCorrectPlayers,
-        },
-        message: "Results retrieved successfully"
-      }),
-      { status: 200, headers: corsHeaders }
+    return createSuccessResponse(
+      {
+        botPlayers: botPlayerNames,
+        currentPlayerCorrectVotes: correctVotes.length,
+        currentPlayerTotalVotes: currentPlayerVotes.length,
+        currentPlayerScore,
+        xpGained,
+        totalCorrectPlayers,
+      },
+      "Results retrieved successfully"
     );
   } catch {
-    return new Response(
-      JSON.stringify({ success: false, data: null, message: "Failed to get game results" }),
-      { status: 500, headers: corsHeaders }
-    );
+    return createErrorResponse("Failed to get game results", 500);
   }
 });
 
