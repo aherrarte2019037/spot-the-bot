@@ -29,3 +29,12 @@ export type VoteWithRelations = Vote & {
   voter: GamePlayer;
   target: GamePlayer;
 };
+
+export type GameResults = {
+  botPlayers: string[];
+  currentPlayerCorrectVotes: number;
+  currentPlayerTotalVotes: number;
+  currentPlayerScore: number;
+  xpGained: number;
+  totalCorrectPlayers: number;
+};

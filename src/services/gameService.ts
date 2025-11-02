@@ -1,6 +1,6 @@
 import { supabase } from '../core/supabase';
 import { gameLogger } from '../utils/logger';
-import { GameWithPlayers, TablesInsert, GamePlayer, Message, Game, MessageWithPlayer } from '../types';
+import { GameWithPlayers, TablesInsert, GamePlayer, Message, Game, MessageWithPlayer, GameResults } from '../types';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
 export const gameService = {
@@ -130,5 +130,18 @@ export const gameService = {
       .subscribe();
 
     return channel;
+  },
+
+  async getGameResults(gameId: number, profileId: string): Promise<GameResults> {
+    const { data: response, error } = await supabase.functions.invoke('get-game-results', {
+      body: { game_id: gameId, profile_id: profileId },
+    });
+
+    if (error || !response.success) {
+      gameLogger.error('Failed to get game results:', error);
+      throw error;
+    }
+
+    return response.data;
   }
 };

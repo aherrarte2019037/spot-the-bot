@@ -16,6 +16,7 @@ export {
   type GamePlayerWithProfile,
   type MessageWithPlayer,
   type VoteWithRelations,
-  type MatchmakingStatus
+  type MatchmakingStatus,
+  type GameResults
 } from './game';
 export { type Database, type Tables, type TablesInsert, type TablesUpdate, type Enums } from './database.types';

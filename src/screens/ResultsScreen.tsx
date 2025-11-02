@@ -4,26 +4,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@react-native-vector-icons/ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthContext } from '../contexts';
-import { AppStackScreenProps, NavigationRoutes } from '../types';
-import { gameService, voteService } from '../services';
-import { gameLogger, getPlayerName } from '../utils';
+import { AppStackScreenProps, NavigationRoutes, GameResults } from '../types';
+import { gameService } from '../services';
+import { gameLogger } from '../utils';
 
 type Props = AppStackScreenProps<NavigationRoutes.Results>;
-
-interface ResultsData {
-  botPlayers: string[];
-  currentPlayerCorrectVotes: number;
-  currentPlayerTotalVotes: number;
-  currentPlayerScore: number;
-  xpGained: number;
-  totalCorrectPlayers: number;
-}
 
 export default function ResultsScreen({ navigation, route }: Props) {
   const { profile, refreshProfile } = useAuthContext();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
-  const [results, setResults] = useState<ResultsData | null>(null);
+  const [results, setResults] = useState<GameResults | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,57 +27,10 @@ export default function ResultsScreen({ navigation, route }: Props) {
       setLoading(true);
       const gameId = parseInt(route.params.gameId);
       
-      // Fetch game with players
-      const game = await gameService.get(gameId);
+      // Get game results from Edge Function
+      const resultsData = await gameService.getGameResults(gameId, profile.id);
       
-      // Fetch votes
-      const votes = await voteService.getByGameId(gameId);
-
-      // Find current player
-      const currentPlayer = game.players.find((p) => p.profile_id === profile.id);
-      if (!currentPlayer) {
-        throw new Error('Current player not found in game');
-      }
-
-      // Identify bot players
-      const botPlayers = game.players.filter((p) => p.is_bot);
-      const botPlayerIds = new Set(botPlayers.map((p) => p.id));
-      const botPlayerNames = botPlayers.map((p) => getPlayerName(p));
-
-      // Get current player's votes
-      const currentPlayerVotes = votes.filter((v) => v.voter_id === currentPlayer.id);
-      const correctVotes = currentPlayerVotes.filter((v) => 
-        v.target_id !== null && botPlayerIds.has(v.target_id)
-      );
-
-      // Get current player's score
-      const currentPlayerScore = currentPlayer.score;
-
-      // Calculate XP gained (score / 10, minimum 10)
-      const xpGained = Math.max(10, Math.floor(currentPlayerScore / 10));
-
-      // Calculate total players who guessed correctly
-      const humanPlayers = game.players.filter((p) => !p.is_bot);
-      let totalCorrectPlayers = 0;
-      
-      for (const player of humanPlayers) {
-        const playerVotes = votes.filter((v) => v.voter_id === player.id);
-        const playerCorrectVotes = playerVotes.filter((v) => 
-          v.target_id !== null && botPlayerIds.has(v.target_id)
-        );
-        if (playerCorrectVotes.length > 0) {
-          totalCorrectPlayers++;
-        }
-      }
-
-      setResults({
-        botPlayers: botPlayerNames,
-        currentPlayerCorrectVotes: correctVotes.length,
-        currentPlayerTotalVotes: currentPlayerVotes.length,
-        currentPlayerScore,
-        xpGained,
-        totalCorrectPlayers,
-      });
+      setResults(resultsData);
     } catch (err) {
       gameLogger.error('Failed to load results:', err);
       setError(err instanceof Error ? err.message : 'Failed to load results');
