@@ -80,6 +80,7 @@ export default function RootNavigator() {
 					<RootStack.Screen
 						name={NavigationRoutes.Results}
 						component={ResultsScreen}
+            options={{ headerShown: false }}
 					/>
 				</>
 			);

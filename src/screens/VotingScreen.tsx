@@ -68,7 +68,6 @@ export default function VotingScreen({ navigation, route }: Props) {
 			if (updatedGame.status === "completed") {
 				navigation.replace(NavigationRoutes.Results, {
 					gameId: game.id.toString(),
-					score: 0, // TODO: Calculate actual score
 				});
 			}
 		});
@@ -198,8 +197,7 @@ export default function VotingScreen({ navigation, route }: Props) {
 			});
 
 			await loadVotes();
-
-			gameLogger.info("Votes submitted successfully");
+      gameLogger.info("Votes submitted successfully");
 		} catch (error) {
 			gameLogger.error("Failed to submit votes:", error);
 		} finally {

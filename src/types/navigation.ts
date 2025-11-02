@@ -25,7 +25,7 @@ export type AppStackParamList = {
   [NavigationRoutes.Matchmaking]: undefined;
   [NavigationRoutes.Game]: { gameId: string };
   [NavigationRoutes.Voting]: { gameId: string };
-  [NavigationRoutes.Results]: { gameId: string; score: number };
+  [NavigationRoutes.Results]: { gameId: string };
 };
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> =
