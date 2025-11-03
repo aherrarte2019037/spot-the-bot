@@ -32,7 +32,7 @@ export default function VotingScreen({ navigation, route }: Props) {
 
 	const [game, setGame] = useState<GameWithPlayers | null>(null);
 	const [votes, setVotes] = useState<Vote[]>([]);
-	const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
+	const [selectedPlayer, setSelectedPlayer] = useState<number | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [submitting, setSubmitting] = useState(false);
 
@@ -141,19 +141,13 @@ export default function VotingScreen({ navigation, route }: Props) {
 		return game.players.filter((p) => p.id !== currentPlayerId.current);
 	}, [game, currentPlayerId.current]);
 
-	const requiredVotes = useMemo(() => {
-		if (!game) return 0;
-		return game.bot_count;
-	}, [game]);
-
 	const hasVoted = useMemo(() => {
 		return votes.some((v) => v.voter_id === currentPlayerId.current);
 	}, [votes, currentPlayerId.current]);
 
-	const votedPlayers = useMemo(() => {
-		return new Set(
-			votes.filter((v) => v.voter_id === currentPlayerId.current).map((v) => v.target_id)
-		);
+	const votedPlayer = useMemo(() => {
+		const vote = votes.find((v) => v.voter_id === currentPlayerId.current);
+		return vote?.target_id ?? null;
 	}, [votes, currentPlayerId.current]);
 
 	const votingProgress = useMemo(() => {
@@ -170,22 +164,13 @@ export default function VotingScreen({ navigation, route }: Props) {
 	const togglePlayerSelection = (playerId: number) => {
 		if (hasVoted) return; // Can't change votes after submitting
 
-		setSelectedPlayers((prev) => {
-			if (prev.includes(playerId)) {
-				// Deselect
-				return prev.filter((id) => id !== playerId);
-			} else {
-				// Select (max requiredVotes)
-				if (prev.length >= requiredVotes) {
-					return prev; // Can't select more
-				}
-				return [...prev, playerId];
-			}
+		setSelectedPlayer((prev) => {
+			return prev === playerId ? null : playerId;
 		});
 	};
 
 	const handleSubmitVotes = async () => {
-		if (!game || selectedPlayers.length !== requiredVotes || hasVoted) return;
+		if (!game || !selectedPlayer || hasVoted) return;
 
 		try {
 			setSubmitting(true);
@@ -193,13 +178,13 @@ export default function VotingScreen({ navigation, route }: Props) {
 			await voteService.submitVotes({
 				game_id: game.id,
 				voter_id: currentPlayerId.current,
-				target_ids: selectedPlayers,
+				target_ids: [selectedPlayer],
 			});
 
 			await loadVotes();
-      gameLogger.info("Votes submitted successfully");
+      gameLogger.info("Vote submitted successfully");
 		} catch (error) {
-			gameLogger.error("Failed to submit votes:", error);
+			gameLogger.error("Failed to submit vote:", error);
 		} finally {
 			setSubmitting(false);
 		}
@@ -209,10 +194,10 @@ export default function VotingScreen({ navigation, route }: Props) {
 		return (
 			!hasVoted &&
 			!submitting &&
-			selectedPlayers.length === requiredVotes &&
+			selectedPlayer !== null &&
 			game?.status === "voting"
 		);
-	}, [hasVoted, submitting, selectedPlayers.length, requiredVotes, game?.status]);
+	}, [hasVoted, submitting, selectedPlayer, game?.status]);
 
 	if (loading) {
 		return (
@@ -238,9 +223,9 @@ export default function VotingScreen({ navigation, route }: Props) {
 	return (
 		<LinearGradient colors={["#0f172a", "#1e293b"]} style={styles.container}>
 			<View style={[styles.header, { paddingTop: insets.top }]}>
-				<Text style={styles.title}>Who are the {requiredVotes} AIs?</Text>
+				<Text style={styles.title}>Who is the AI?</Text>
 				<Text style={styles.subtitle}>
-					Select {requiredVotes} {requiredVotes === 1 ? "player" : "players"} you suspect
+					Select 1 player you suspect is a bot
 				</Text>
 				{hasVoted && (
 					<View style={styles.votedBadge}>
@@ -257,8 +242,8 @@ export default function VotingScreen({ navigation, route }: Props) {
 			>
 				<View style={styles.playersGrid}>
 					{otherPlayers.map((player) => {
-						const isSelected = selectedPlayers.includes(player.id);
-						const wasVotedFor = votedPlayers.has(player.id);
+						const isSelected = selectedPlayer === player.id;
+						const wasVotedFor = votedPlayer === player.id;
 
 						return (
 							<TouchableOpacity
@@ -320,7 +305,7 @@ export default function VotingScreen({ navigation, route }: Props) {
 					) : (
 						<>
 							<Text style={styles.submitButtonText}>
-								Submit ({selectedPlayers.length}/{requiredVotes})
+								{selectedPlayer ? "Submit Vote" : "Select a player"}
 							</Text>
 						</>
 					)}

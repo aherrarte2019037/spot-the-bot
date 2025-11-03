@@ -78,8 +78,8 @@ export const matchmakingService = {
         topic: topic.topic,
         topic_id: topic.id,
         max_players: 7,
-        bot_count: 2,
-        chat_duration: 120,
+        bot_count: 1,
+        chat_duration: 5,
       };
 
       const { data: gameData, error: gameError } = await supabase
@@ -93,7 +93,7 @@ export const matchmakingService = {
         throw gameError;
       }
 
-      await this.addBotsToGame(gameData.id, 2);
+      await this.addBotsToGame(gameData.id, 1);
 
       await gameService.join(gameData.id, profileId);
       const game = await gameService.get(gameData.id);

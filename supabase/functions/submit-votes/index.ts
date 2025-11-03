@@ -17,7 +17,7 @@ serve(async (req) => {
 
     const { game_id, voter_id, target_ids }: SubmitVotesRequest = await req.json();
 
-    if (!game_id || !voter_id || !target_ids || !Array.isArray(target_ids)) {
+    if (!game_id || !voter_id || !target_ids || !Array.isArray(target_ids) || target_ids.length === 0) {
       return createErrorResponse("Missing required fields: game_id, voter_id, target_ids", 400);
     }
 
@@ -46,14 +46,14 @@ serve(async (req) => {
       return createErrorResponse("Bots cannot vote", 403);
     }
 
-    if (target_ids.length !== game.bot_count) {
-      return createErrorResponse(`Must vote for exactly ${game.bot_count} players`, 400);
-    }
-
     const allPlayerIds = players.map((p) => p.id);
     const invalidTargets = target_ids.filter((id) => !allPlayerIds.includes(id));
     if (invalidTargets.length > 0) {
       return createErrorResponse("Invalid target player IDs", 400);
+    }
+
+    if (target_ids.includes(voter_id)) {
+      return createErrorResponse("Cannot vote for yourself", 400);
     }
 
     // 5. Check if voter has already voted
@@ -123,7 +123,7 @@ serve(async (req) => {
             // Count correct votes (votes for actual bots)
             const correctVotes = playerVotes.filter((v) => v.target_id !== null && botPlayerIds.has(v.target_id)).length;
 
-            // Calculate score (e.g., 100 points per correct vote)
+            // Calculate score (100 points per correct vote)
             const score = correctVotes * 100;
 
             scores.push({
