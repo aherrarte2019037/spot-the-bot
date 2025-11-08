@@ -1,4 +1,3 @@
-import { serve } from "deno";
 import type { TablesUpdate } from "../_shared/database.types.ts";
 import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
 import type { GameStatus } from "../_shared/schemas.ts";
@@ -7,7 +6,7 @@ interface StartGameRequest {
   game_id: number;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     const authError = requireAuth(req);
     if (authError) return authError;

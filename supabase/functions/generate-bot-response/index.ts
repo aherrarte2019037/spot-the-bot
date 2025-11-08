@@ -1,4 +1,3 @@
-import { serve } from "deno";
 import type { TablesInsert } from "../_shared/database.types.ts";
 import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
 import { AIService } from "../_shared/aiService.ts";
@@ -8,7 +7,7 @@ interface GenerateBotResponseRequest {
   bot_player_id: number;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   try {
     const authError = requireAuth(req);
     if (authError) return authError;
