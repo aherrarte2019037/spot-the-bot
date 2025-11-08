@@ -1,6 +1,7 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "deno";
 import type { TablesUpdate } from "../_shared/database.types.ts";
 import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
+import type { GameStatus } from "../_shared/schemas.ts";
 
 interface StartGameRequest {
   game_id: number;
@@ -30,7 +31,7 @@ serve(async (req) => {
       return createErrorResponse("Game not found", 404);
     }
 
-    const currentStatus = game.status;
+    const currentStatus = game.status as GameStatus;
     if (currentStatus !== "waiting") {
       return createErrorResponse(`Game is not in waiting status (current: ${currentStatus})`, 400);
     }
@@ -38,7 +39,7 @@ serve(async (req) => {
     // 2. Update game to chatting status with started_at timestamp
     const startedAt = new Date().toISOString();
     const gameUpdate: TablesUpdate<"games"> = {
-      status: "chatting",
+      status: "chatting" as GameStatus,
       started_at: startedAt,
     };
     

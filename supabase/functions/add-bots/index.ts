@@ -1,6 +1,7 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import type { Database, TablesInsert } from "../_shared/database.types.ts";
+import { serve } from "deno";
+import type { TablesInsert } from "../_shared/database.types.ts";
 import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
+import type { BotPersonality } from "../_shared/schemas.ts";
 
 const ADJECTIVES = [
   'swift', 'clever', 'bold', 'sharp', 'nimble', 'bright', 'quick', 'wise',
@@ -47,7 +48,7 @@ serve(async (req) => {
       return createErrorResponse("Game not found", 404);
     }
 
-    const personalities: Database["public"]["Enums"]["bot_personality"][] = ['casual', 'formal', 'quirky'];
+    const personalities: BotPersonality[] = ['casual', 'formal', 'quirky'];
     const bots: TablesInsert<"game_players">[] = [];
 
     for (let i = 0; i < count; i++) {
