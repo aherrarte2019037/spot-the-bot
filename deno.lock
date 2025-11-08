@@ -38,6 +38,7 @@
     "packageJson": {
       "dependencies": [
         "npm:@hookform/resolvers@^5.2.2",
+        "npm:@langchain/google-genai@1",
         "npm:@legendapp/list@^2.0.14",
         "npm:@react-native-async-storage/async-storage@^2.2.0",
         "npm:@react-native-google-signin/google-signin@16",
