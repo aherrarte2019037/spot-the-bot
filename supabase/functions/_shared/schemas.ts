@@ -10,6 +10,8 @@ export type GamePlayer = Tables<'game_players'>;
 export type Message = Tables<'messages'>;
 export type Vote = Tables<'votes'>;
 export type Topic = Tables<'topics'>;
+export type GameResultsView = Tables<'game_results_view'>
+export type GameBotPlayersView = Tables<'game_bot_players_view'>;
 
 export type GameStatus = Enums<'game_status'>;
 export type BotPersonality = Enums<'bot_personality'>;

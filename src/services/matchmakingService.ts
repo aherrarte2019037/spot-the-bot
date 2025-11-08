@@ -79,7 +79,7 @@ export const matchmakingService = {
         topic_id: topic.id,
         max_players: 7,
         bot_count: 1,
-        chat_duration: 5,
+        chat_duration: 5, // TODO: Change to 180 seconds (3 minutes)
       };
 
       const { data: gameData, error: gameError } = await supabase

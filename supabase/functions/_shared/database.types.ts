@@ -152,6 +152,13 @@ export type Database = {
             referencedRelation: "game_players"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "messages_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "game_results_view"
+            referencedColumns: ["player_id"]
+          },
         ]
       }
       profiles: {
@@ -255,20 +262,102 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "votes_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "game_results_view"
+            referencedColumns: ["player_id"]
+          },
+          {
             foreignKeyName: "votes_voter_id_fkey"
             columns: ["voter_id"]
             isOneToOne: false
             referencedRelation: "game_players"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "votes_voter_id_fkey"
+            columns: ["voter_id"]
+            isOneToOne: false
+            referencedRelation: "game_results_view"
+            referencedColumns: ["player_id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      game_bot_players_view: {
+        Row: {
+          bot_player_ids: number[] | null
+          bot_player_names: string[] | null
+          game_id: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_results_view: {
+        Row: {
+          bot_username: string | null
+          correct_votes: number | null
+          game_id: number | null
+          guessed_correctly: boolean | null
+          is_bot: boolean | null
+          player_id: number | null
+          profile_id: string | null
+          score: number | null
+          total_votes: number | null
+          xp_gained: number | null
+        }
+        Insert: {
+          bot_username?: string | null
+          correct_votes?: never
+          game_id?: number | null
+          guessed_correctly?: never
+          is_bot?: boolean | null
+          player_id?: number | null
+          profile_id?: string | null
+          score?: number | null
+          total_votes?: never
+          xp_gained?: never
+        }
+        Update: {
+          bot_username?: string | null
+          correct_votes?: never
+          game_id?: number | null
+          guessed_correctly?: never
+          is_bot?: boolean | null
+          player_id?: number | null
+          profile_id?: string | null
+          score?: number | null
+          total_votes?: never
+          xp_gained?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_players_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_players_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
-      calculate_level: { Args: { xp_amount: number }; Returns: number }
       get_random_topic: {
         Args: never
         Returns: {
