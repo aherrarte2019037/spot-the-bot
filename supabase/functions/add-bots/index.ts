@@ -1,5 +1,5 @@
 import type { TablesInsert } from "../_shared/database.types.ts";
-import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth } from "../_shared/utils.ts";
+import { createErrorResponse, createSuccessResponse, createSupabaseClient, requireAuth, generateId } from "../_shared/utils.ts";
 import type { BotPersonality } from "../_shared/schemas.ts";
 
 const ADJECTIVES = [
@@ -52,6 +52,7 @@ Deno.serve(async (req) => {
 
     for (let i = 0; i < count; i++) {
       const botName = generateBotName();
+      const threadId = generateId();
 
       bots.push({
         game_id,
@@ -60,6 +61,7 @@ Deno.serve(async (req) => {
         bot_personality: personalities[i % personalities.length],
         bot_username: botName,
         score: 0,
+        bot_thread_id: threadId,
       });
     }
 

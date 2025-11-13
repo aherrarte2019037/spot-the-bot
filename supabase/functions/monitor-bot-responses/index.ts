@@ -85,7 +85,7 @@ Deno.serve(async () => {
     for (const game of activeGames) {
       const { data: botPlayers, error: botsError } = await supabase
         .from("game_players")
-        .select("id, bot_username, is_bot, bot_personality")
+        .select("id, bot_username, is_bot, bot_personality, bot_thread_id")
         .eq("game_id", game.id)
         .eq("is_bot", true);
 
@@ -134,10 +134,18 @@ Deno.serve(async () => {
               message: msg.content,
             }));
 
+            if (!bot.bot_thread_id) {
+              errors.push(
+                `Bot ${bot.id} in game ${game.id}: Missing bot_thread_id`
+              );
+              continue;
+            }
+
             const botMessage = await aiService.generateMessage({
               personality: bot.bot_personality,
               topic: game.topic,
               conversationHistory,
+              threadId: bot.bot_thread_id,
             });
 
             const messageToInsert: TablesInsert<"messages"> = {
