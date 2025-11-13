@@ -17,6 +17,7 @@ export type Database = {
       game_players: {
         Row: {
           bot_personality: Database["public"]["Enums"]["bot_personality"]
+          bot_thread_id: string | null
           bot_username: string
           created_at: string
           game_id: number | null
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           bot_personality?: Database["public"]["Enums"]["bot_personality"]
+          bot_thread_id?: string | null
           bot_username?: string
           created_at?: string
           game_id?: number | null
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           bot_personality?: Database["public"]["Enums"]["bot_personality"]
+          bot_thread_id?: string | null
           bot_username?: string
           created_at?: string
           game_id?: number | null

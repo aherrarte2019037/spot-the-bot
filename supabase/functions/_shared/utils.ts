@@ -57,3 +57,7 @@ export function requireAuth(req: Request): Response | null {
   return null;
 }
 
+export function generateId(): string {
+  return crypto.randomUUID();
+}
+
