@@ -6,7 +6,8 @@
     "@langchain/core": "npm:@langchain/core@^0.3.0",
     "@langchain/core/prompts": "npm:@langchain/core@^0.3.0/prompts",
     "@langchain/core/language_models/chat_models": "npm:@langchain/core@^0.3.0/language_models/chat_models",
-    "zod": "npm:zod@^3.23.0"
+    "zod": "npm:zod@^3.23.0",
+    "delay": "npm:delay@^7.0.0"
   }
 }
 

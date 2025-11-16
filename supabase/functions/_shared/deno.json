@@ -3,6 +3,7 @@
     "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
     "@langchain/google-genai": "npm:@langchain/google-genai@^1.0.0",
     "langchain": "npm:langchain@^1.0.3",
-    "langsmith": "npm:langsmith@^0.3.79"
+    "langsmith": "npm:langsmith@^0.3.79",
+    "zod": "npm:zod@^4.1.12"
   }
 }

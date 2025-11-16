@@ -2,8 +2,10 @@
   "version": "5",
   "specifiers": {
     "npm:@langchain/google-genai@1": "1.0.0_@langchain+core@1.0.4",
-    "npm:langchain@^1.0.3": "1.0.4_@langchain+core@1.0.4_zod@4.1.12",
-    "npm:zod@^4.1.12": "4.1.12"
+    "npm:@types/node@*": "24.2.0",
+    "npm:delay@7": "7.0.0",
+    "npm:langchain@^1.0.3": "1.0.4_@langchain+core@1.0.4_zod@3.25.76",
+    "npm:zod@^3.23.0": "3.25.76"
   },
   "npm": {
     "@cfworker/json-schema@4.1.1": {
@@ -55,7 +57,7 @@
         "@langchain/core"
       ]
     },
-    "@langchain/langgraph@1.0.2_@langchain+core@1.0.4_zod@4.1.12": {
+    "@langchain/langgraph@1.0.2_@langchain+core@1.0.4_zod@3.25.76": {
       "integrity": "sha512-syxzzWTnmpCL+RhUEvalUeOXFoZy/KkzHa2Da2gKf18zsf9Dkbh3rfnRDrTyUGS1XSTejq07s4rg1qntdEDs2A==",
       "dependencies": [
         "@langchain/core",
@@ -63,6 +65,12 @@
         "@langchain/langgraph-sdk",
         "uuid@10.0.0",
         "zod"
+      ]
+    },
+    "@types/node@24.2.0": {
+      "integrity": "sha512-3xyG3pMCq3oYCNg7/ZP+E1ooTaGB4cG8JWRsqqOYQdbWNY4zbaV0Ennrd7stjiJEFZCaybcIgpTjJWHRfBSIDw==",
+      "dependencies": [
+        "undici-types"
       ]
     },
     "@types/retry@0.12.0": {
@@ -111,6 +119,13 @@
     "decamelize@1.2.0": {
       "integrity": "sha512-z2S+W9X73hAUUki+N+9Za2lBlun89zigOyGrsax+KUQ6wKW4ZoWpEYBkGhQjwAjjDCkWxhY0VKEhk8wzY7F5cA=="
     },
+    "delay@7.0.0": {
+      "integrity": "sha512-C3vaGs818qzZjCvVJ98GQUMVyWeg7dr5w2Nwwb2t5K8G98jOyyVO2ti2bKYk5yoYElqH3F2yA53ykuEnwD6MCg==",
+      "dependencies": [
+        "random-int",
+        "unlimited-timeout"
+      ]
+    },
     "eventemitter3@4.0.7": {
       "integrity": "sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw=="
     },
@@ -123,7 +138,7 @@
         "base64-js"
       ]
     },
-    "langchain@1.0.4_@langchain+core@1.0.4_zod@4.1.12": {
+    "langchain@1.0.4_@langchain+core@1.0.4_zod@3.25.76": {
       "integrity": "sha512-g7z2kKvnXOecybbVGHfI2ZmdmP309mxC1FYlq6WC/7RsKgX5MwY9gBjwK16mpKOaozOD9QCo1Ia7o2UcUBRb9Q==",
       "dependencies": [
         "@langchain/core",
@@ -173,6 +188,9 @@
         "p-finally"
       ]
     },
+    "random-int@3.1.0": {
+      "integrity": "sha512-h8CRz8cpvzj0hC/iH/1Gapgcl2TQ6xtnCpyOI5WvWfXf/yrDx2DOU+tD9rX23j36IF11xg1KqB9W11Z18JPMdw=="
+    },
     "retry@0.13.1": {
       "integrity": "sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg=="
     },
@@ -189,6 +207,12 @@
         "has-flag"
       ]
     },
+    "undici-types@7.10.0": {
+      "integrity": "sha512-t5Fy/nfn+14LuOc2KNYg75vZqClpAiqscVvMygNnlsHBFpSXdJaYtXMcdNLpl/Qvc3P2cB3s6lOV51nqsFq4ag=="
+    },
+    "unlimited-timeout@0.1.0": {
+      "integrity": "sha512-D4g+mxFeQGQHzCfnvij+R35ukJ0658Zzudw7j16p4tBBbNasKkKM4SocYxqhwT5xA7a9JYWDzKkEFyMlRi5sng=="
+    },
     "uuid@10.0.0": {
       "integrity": "sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==",
       "bin": true
@@ -201,17 +225,40 @@
       "integrity": "sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==",
       "bin": true
     },
-    "zod@4.1.12": {
-      "integrity": "sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ=="
+    "zod@3.25.76": {
+      "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
     }
+  },
+  "redirects": {
+    "https://esm.sh/@supabase/supabase-js@2": "https://esm.sh/@supabase/supabase-js@2.78.0",
+    "https://esm.sh/tr46@~0.0.3?target=denonext": "https://esm.sh/tr46@0.0.3?target=denonext",
+    "https://esm.sh/webidl-conversions@^3.0.0?target=denonext": "https://esm.sh/webidl-conversions@3.0.1?target=denonext",
+    "https://esm.sh/whatwg-url@^5.0.0?target=denonext": "https://esm.sh/whatwg-url@5.0.0?target=denonext"
+  },
+  "remote": {
+    "https://esm.sh/@supabase/auth-js@2.78.0/denonext/auth-js.mjs": "13c898e0ef06ebba84c7a5816a89da2f016373e653e0e904f03eef5c7b47ec2a",
+    "https://esm.sh/@supabase/functions-js@2.78.0/denonext/functions-js.mjs": "dc4dd003a0601d918d8d84cc528e81d843aaa08696a84be2a5ba4f8b46d370b3",
+    "https://esm.sh/@supabase/node-fetch@2.6.15/denonext/node-fetch.mjs": "0bae9052231f4f6dbccc7234d05ea96923dbf967be12f402764580b6bf9f713d",
+    "https://esm.sh/@supabase/postgrest-js@2.78.0/denonext/postgrest-js.mjs": "7d90335d17278d166c1f50735618feaea6fb4e7213bf84b08407cc3382e97d17",
+    "https://esm.sh/@supabase/realtime-js@2.78.0/denonext/realtime-js.mjs": "e2a411469e921f5a238d1bf838a5b34b7ab6b5914951b7229cf100b3ec9713b1",
+    "https://esm.sh/@supabase/storage-js@2.78.0/denonext/storage-js.mjs": "efec6194456e3e3352fe2690b69656577b42581c53d1aba8f3c93c03f2260cec",
+    "https://esm.sh/@supabase/supabase-js@2.78.0": "a3324194502542b35793070a5f666e253a764baa74a410d309b25764666014a4",
+    "https://esm.sh/@supabase/supabase-js@2.78.0/denonext/supabase-js.mjs": "43f46d2dbfe38506adb6705460ac42205570b45b7890b3c5ee92de9ab992be43",
+    "https://esm.sh/tr46@0.0.3/denonext/tr46.mjs": "5753ec0a99414f4055f0c1f97691100f13d88e48a8443b00aebb90a512785fa2",
+    "https://esm.sh/tr46@0.0.3?target=denonext": "19cb9be0f0d418a0c3abb81f2df31f080e9540a04e43b0f699bce1149cba0cbb",
+    "https://esm.sh/tslib@2.8.1/denonext/tslib.mjs": "ebce3cd5facb654623020337f867b426ba95f71596ba87acc9e6c6f4e55905ca",
+    "https://esm.sh/webidl-conversions@3.0.1/denonext/webidl-conversions.mjs": "54b5c2d50a294853c4ccebf9d5ed8988c94f4e24e463d84ec859a866ea5fafec",
+    "https://esm.sh/webidl-conversions@3.0.1?target=denonext": "4e20318d50528084616c79d7b3f6e7f0fe7b6d09013bd01b3974d7448d767e29",
+    "https://esm.sh/whatwg-url@5.0.0/denonext/whatwg-url.mjs": "29b16d74ee72624c915745bbd25b617cfd2248c6af0f5120d131e232a9a9af79",
+    "https://esm.sh/whatwg-url@5.0.0?target=denonext": "f001a2cadf81312d214ca330033f474e74d81a003e21e8c5d70a1f46dc97b02d"
   },
   "workspace": {
     "dependencies": [
+      "npm:@langchain/core@0.3",
       "npm:@langchain/google-genai@1",
       "npm:delay@7",
       "npm:langchain@^1.0.3",
-      "npm:langsmith@~0.3.79",
-      "npm:zod@^4.1.12"
+      "npm:zod@^3.23.0"
     ]
   }
 }
